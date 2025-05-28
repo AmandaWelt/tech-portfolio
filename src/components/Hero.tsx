@@ -13,21 +13,23 @@ const Hero: React.FC = () => {
       {/* Column 1: Text + Stats */}
       <div className="bg-surface rounded-2xl p-10 flex flex-col justify-between h-full shadow-md">
         <div>
-          <h1 className="text-4xl font-header mb-6 leading-snug">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-header mb-6 leading-snug break-words">
             Developing your ideas<br />
             from the <span className="bg-accent text-black px-2 py-1 rounded">initial concept</span><br />
             to <span className="bg-accent text-black px-2 py-1 rounded">final execution.</span>
           </h1>
 
+
           <a
             href="mailto:mandy@funkyouter.space"
-            className="mt-8 px-8 py-3 border border-primary rounded-full text-white text-base font-body hover:shadow-[0_0_12px_#a78bfa] transition w-full text-center"
+            className="mt-6 px-6 py-2 border border-primary rounded-full text-white font-body hover:shadow-[0_0_12px_#a78bfa] transition inline-block text-center"
           >
             Hire me 👋
           </a>
+
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mt-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-8">
           <div className="bg-card border border-white/12 rounded-2xl p-5 text-center text-sm shadow-sm">
             <h2 className="text-3xl font-bold">3+</h2>
             <p className="mt-2 font-body">years of experience</p>
@@ -44,13 +46,14 @@ const Hero: React.FC = () => {
       </div>
 
       {/* Column 2: Image */}
-      <div className="w-48 md:w-60 h-full rounded-2xl overflow-hidden shadow-md flex items-center justify-center bg-surface glitch-container">
+      <div className="w-full lg:w-60 h-full rounded-2xl overflow-hidden shadow-md flex items-center justify-center bg-surface glitch-container">
         <img
           src={mePic}
           alt="Amanda Welt"
-          className="object-cover w-full h-full filter grayscale glitch-img"
+          className="object-cover w-full h-full max-h-[500px] filter grayscale glitch-img"
         />
       </div>
+
 
       {/* Column 3: Info + Icons */}
       <div className="flex flex-col justify-between h-full">
