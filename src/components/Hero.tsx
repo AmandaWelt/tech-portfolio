@@ -1,6 +1,11 @@
 import React from "react";
 import mePic from "../Assets/mepic.jpg";
-
+import {
+  Github,
+  Linkedin,
+  Mail,
+  FileText,
+} from "lucide-react";
 
 const Hero: React.FC = () => {
   return (
@@ -14,9 +19,12 @@ const Hero: React.FC = () => {
             to <span className="bg-accent text-black px-2 py-1 rounded">final execution.</span>
           </h1>
 
-          <button className="mt-8 px-8 py-3 border border-primary rounded-full text-white text-base font-body hover:shadow-[0_0_12px_#a78bfa] transition w-full">
+          <a
+            href="mailto:mandy@funkyouter.space"
+            className="mt-8 px-8 py-3 border border-primary rounded-full text-white text-base font-body hover:shadow-[0_0_12px_#a78bfa] transition w-full text-center"
+          >
             Hire me 👋
-          </button>
+          </a>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mt-10">
@@ -44,7 +52,6 @@ const Hero: React.FC = () => {
         />
       </div>
 
-
       {/* Column 3: Info + Icons */}
       <div className="flex flex-col justify-between h-full">
         <div className="w-full h-full flex flex-col gap-4 text-lg">
@@ -60,10 +67,36 @@ const Hero: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-2 gap-6 h-[70%] w-full mt-6">
-          <div className="bg-surface p-4 rounded-2xl flex items-center justify-center text-xl">G</div>
-          <div className="bg-surface p-4 rounded-2xl flex items-center justify-center text-xl">in</div>
-          <div className="bg-surface p-4 rounded-2xl flex items-center justify-center text-xl">@</div>
-          <div className="bg-surface p-4 rounded-2xl flex items-center justify-center text-xl">📄</div>
+          <a
+            href="https://github.com/AmandaWelt"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-primary/10 p-4 rounded-full flex items-center justify-center shadow-[0_0_10px_#a78bfa] hover:scale-105 transition"
+          >
+            <Github className="text-primary w-6 h-6" />
+          </a>
+
+          <a
+            href="https://linkedin.com/in/amanda-welt-119b17151/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-primary/10 p-4 rounded-full flex items-center justify-center shadow-[0_0_10px_#a78bfa] hover:scale-105 transition"
+          >
+            <Linkedin className="text-primary w-6 h-6" />
+          </a>
+          <a
+            href="mailto:mandy@funkyouter.space"
+            className="bg-primary/10 p-4 rounded-full flex items-center justify-center shadow-[0_0_10px_#a78bfa] hover:scale-105 transition"
+          >
+            <Mail className="text-primary w-6 h-6" />
+          </a>
+          <a
+            href="/AmandaWelt_Resume.pdf"
+            download
+            className="bg-primary/10 p-4 rounded-full flex items-center justify-center shadow-[0_0_10px_#a78bfa] hover:scale-105 transition"
+          >
+            <FileText className="text-primary w-6 h-6" />
+          </a>
         </div>
       </div>
     </section>
