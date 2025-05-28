@@ -1,13 +1,12 @@
 import React from 'react';
-import Abilities from './components/Abilities';
+import Hero from './components/Hero';
 
 function App() {
   return (
-    <div className="font-sans text-gray-800">
-      <Abilities />
+    <div className="min-h-screen bg-background text-white font-sans">
+      <Hero />
     </div>
   );
 }
 
 export default App;
-
