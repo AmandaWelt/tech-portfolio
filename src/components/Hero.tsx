@@ -46,11 +46,11 @@ const Hero: React.FC = () => {
       </div>
 
       {/* Column 2: Image */}
-      <div className="w-full lg:w-60 h-full rounded-2xl overflow-hidden shadow-md flex items-center justify-center bg-surface glitch-container">
+      <div className="w-full lg:w-60 h-full rounded-2xl overflow-hidden shadow-md flex items-center justify-center bg-surface object-cover glitch-container">
         <img
           src={mePic}
           alt="Amanda Welt"
-          className="object-cover w-full h-full max-h-[500px] filter grayscale glitch-img"
+          className="object-cover w-full h-full filter grayscale glitch-img"
         />
       </div>
 
