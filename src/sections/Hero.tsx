@@ -15,9 +15,9 @@ const Hero: React.FC<Props> = ({ logoSrc }) => {
             alt="Amanda Welt monogram"
             className="
               mx-auto
-              w-[45%]          /* big on mobile */
-              sm:w-[40%]       /* tablet */
-              md:w-[45%]       /* desktop */
+              w-[30%]          /* big on mobile */
+              sm:w-[50%]       /* tablet */
+              md:w-[30%]       /* desktop */
               h-auto object-contain
             "
             loading="eager"

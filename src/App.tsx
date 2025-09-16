@@ -85,7 +85,6 @@ const App: React.FC = () => {
 
   const navigation = [
     { id: "projects", label: "Projects", icon: Code2 },
-    //{ id: "about", label: "About", icon: User },
     { id: "skills", label: "Skills", icon: Code2 },
     { id: "experience", label: "Experience", icon: Briefcase },
     { id: "contact", label: "Contact", icon: Mail },
@@ -125,7 +124,6 @@ const App: React.FC = () => {
           {/* Sections */}
           <div className="px-4 sm:px-8 py-12 sm:py-16">
             {activeSection === "projects" && <ProjectsSection projects={projects} />}
-            {/*{activeSection === "about" && <AboutSection />}*/}
             {activeSection === "skills" && <SkillsSection skills={skills} />}
             {activeSection === "experience" && <Experience experience={experience} />}
             {activeSection === "contact" && (
