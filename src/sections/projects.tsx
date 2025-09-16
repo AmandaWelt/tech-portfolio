@@ -12,7 +12,8 @@ const Projects: React.FC<Props> = ({ projects }) => {
     <>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-light tracking-wide mb-4">FEATURED PROJECTS</h2>
+          <h2 className="text-4xl md:text-5xl font-light tracking-wide">FEATURED PROJECTS</h2>
+          <p className="text-2xl font-light tracking-wide"> Designed and built by me! </p>
           <div className="w-16 h-px bg-black mx-auto" />
         </div>
 
