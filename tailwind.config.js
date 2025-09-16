@@ -18,7 +18,13 @@ module.exports = {
       fontFamily: {
         header: ['Ubuntu', 'sans-serif'],
         body: ['Pontano Sans', 'sans-serif'],
-      }
+      },
+      screens: {
+        '3xl': '1920px',
+        '4xl': '2560px',
+        '5xl': '3200px',
+        'ultra': '5120px',
+      },
     },    
   },
   plugins: [],
