@@ -37,18 +37,6 @@ const Contact: React.FC<Props> = ({
           </div>
 
           <div>
-            <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-2">WEBSITE</h3>
-            <a
-              href={`https://${website}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-black hover:text-gray-600 transition-colors"
-            >
-              {website}
-            </a>
-          </div>
-
-          <div>
             <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-4">LANGUAGES</h3>
             <p className="text-gray-800">English, Levantine Arabic (Conversational)</p>
           </div>
