@@ -31,7 +31,7 @@ const App: React.FC = () => {
 
   const experience: ExperienceItem[] = [
     {
-      title: "Software Engineer",
+      title: "Junior Developer",
       company: "Funky Outer Space",
       period: "2024–Current",
       description:
@@ -59,7 +59,7 @@ const App: React.FC = () => {
       ],
     },    
     {
-      title: "Tattoo Artist- Digital Design",
+      title: "Tattoo Artist",
       company: "Sacred Art Tattoo",
       period: "2021–2024",
       description:
