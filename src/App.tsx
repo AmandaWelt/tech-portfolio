@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Mail, Code2, User, Briefcase } from "lucide-react";
+import { Mail, Code2, Briefcase } from "lucide-react";
 
 import Hero from "./sections/Hero";
 import ProjectsSection from "./sections/projects";
