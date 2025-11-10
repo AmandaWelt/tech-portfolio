@@ -10,10 +10,9 @@ type Props = {
 
 const Contact: React.FC<Props> = ({
   email,
-  website,
   location,
   resumeUrl,
-  resumeDownloadName = "WeltResume (1).pdf",
+  resumeDownloadName = "Resume.pdf",
 }) => (
   <div className="max-w-6xl mx-auto">
     <div className="text-center mb-16">

@@ -128,10 +128,10 @@ const App: React.FC = () => {
             {activeSection === "experience" && <Experience experience={experience} />}
             {activeSection === "contact" && (
               <ContactSection
-                email="Mandy@funkyouter.space"
+                email="Amanda.jolyn@gmail.com"
                 website="amandawelt.com"
                 location="Oklahoma City, OK"
-                resumeUrl="/AmandaWelt_Resume.png"  
+                resumeUrl="/WeltResume.pdf"  
               />
             )}
           </div>
