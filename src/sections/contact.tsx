@@ -13,7 +13,7 @@ const Contact: React.FC<Props> = ({
   website,
   location,
   resumeUrl,
-  resumeDownloadName = "WeltResume (1).pdf",
+  resumeDownloadName = "AmandaWelt_Resume.png",
 }) => (
   <div className="max-w-6xl mx-auto">
     <div className="text-center mb-16">

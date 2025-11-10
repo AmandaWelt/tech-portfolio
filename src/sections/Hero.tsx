@@ -16,7 +16,7 @@ const Hero: React.FC<Props> = ({ logoSrc }) => {
             className="
               mx-auto
               w-[30%]          /* big on mobile */
-              sm:w-[40%]       /* tablet */
+              sm:w-[50%]       /* tablet */
               md:w-[30%]       /* desktop */
               h-auto object-contain
             "
@@ -32,7 +32,7 @@ const Hero: React.FC<Props> = ({ logoSrc }) => {
             text-gray-400 font-light tracking-wide
           "
         >
-          SOFTWARE ENGINEER | REACT.JS | TYPESCRIPT
+          JUNIOR DEVELOPER | REACT.JS | TYPESCRIPT
         </p>
 
         <div className="mx-auto my-6 h-px w-24 md:w-32 bg-gray-400" />
