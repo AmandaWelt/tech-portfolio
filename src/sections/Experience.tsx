@@ -1,14 +1,15 @@
 import React from "react";
 import type { ExperienceItem } from "../types/portfolio";
 
-type Props = { experience: ExperienceItem[] };
+type Props = { experience: ExperienceItem[]; summary?: string };
 
-const Experience: React.FC<Props> = ({ experience }) => (
+const Experience: React.FC<Props> = ({ experience, summary }) => (
   <div className="max-w-6xl mx-auto">
     <div className="text-center mb-16">
       <h2 className="text-4xl md:text-5xl font-light tracking-wide mb-4">EXPERIENCE</h2>
       <div className="w-16 h-px bg-black mx-auto" />
     </div>
+
 
     <div className="space-y-16">
       {experience.map((job, idx) => (
@@ -30,6 +31,9 @@ const Experience: React.FC<Props> = ({ experience }) => (
                   </li>
                 ))}
               </ul>
+              {job.footer ? (
+                <p className="mt-6 text-sm text-gray-600 font-light">{job.footer}</p>
+              ) : null}
             </div>
           </div>
         </div>

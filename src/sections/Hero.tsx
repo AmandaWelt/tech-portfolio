@@ -5,49 +5,43 @@ type Props = {
   logoSrc: string;
 };
 
+const imgClassName =
+  "mx-auto w-[30%] sm:w-[40%] md:w-[30%] h-auto object-contain";
+
+const taglineClassName =
+  "text-sm sm:text-base md:text-xl lg:text-2xl 2xl:text-3xl min-[2560px]:text-4xl ultra:text-4xl text-gray-400 font-light tracking-wide";
+
+const bioClassName =
+  "mx-auto text-sm sm:text-base md:text-lg lg:text-xl 2xl:text-2xl 3xl:text-3xl 4xl:text-4xl ultra:text-6xl min-[2560px]:text-[28px] text-gray-300 font-light leading-relaxed p-3";
+
 const Hero: React.FC<Props> = ({ logoSrc }) => {
   return (
     <div className="relative bg-black">
       <div className="mx-auto text-center">
         <div className="mb-10 select-none pointer-events-none">
           <img
-            src={logoSrc || mLogo} 
+            src={logoSrc || mLogo}
             alt="Amanda Welt monogram"
-            className="
-              mx-auto
-              w-[30%]          /* big on mobile */
-              sm:w-[40%]       /* tablet */
-              md:w-[30%]       /* desktop */
-              h-auto object-contain
-            "
+            className={imgClassName}
             loading="eager"
             decoding="async"
           />
         </div>
 
-        <p
-          className="
-            text-sm sm:text-base md:text-xl lg:text-2xl
-            2xl:text-3xl min-[2560px]:text-4xl ultra:text-4xl
-            text-gray-400 font-light tracking-wide
-          "
-        >
-          SOFTWARE ENGINEER | REACT.JS | TYPESCRIPT
+        <p className={taglineClassName}>
+          SOFTWARE ENGINEER | REACT | VUE | TYPESCRIPT
         </p>
 
         <div className="mx-auto my-6 h-px w-24 md:w-32 bg-gray-400" />
 
-        <p
-          className="
-            mx-auto
-            text-sm sm:text-base md:text-lg lg:text-xl
-            2xl:text-2xl 3xl:text-3xl 4xl:text-4xl ultra:text-6xl min-[2560px]:text-[28px]
-            text-gray-300 font-light leading-relaxed p-3
-          "
-        >
-          Full-Stack Developer specializing in React, TypeScript, and modern web technologies.
-          Successfully delivered multiple production MVPs including AI-powered applications.
-          Former military intelligence professional bringing analytical thinking and precision to software development.
+        <p className={bioClassName}>
+          Senior engineer and front-end team lead specializing in
+          React, Vue, TypeScript, and production UIs, including merchant admin PWAs,
+          payments and onboarding flows, and building LLM-backed product surfaces
+          (retrieval, grounding, citations). Previously
+          shipped multiple MVPs end-to-end with a boutique studio stack. Former
+          military intelligence professional bringing analytical thinking and
+          precision to software development.
         </p>
       </div>
     </div>

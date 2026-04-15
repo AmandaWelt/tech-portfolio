@@ -18,5 +18,7 @@ export type ExperienceItem = {
   company: string;
   period: string;
   description: string;
+  /** Optional; shown as a single line after bullets (e.g. "Tech: …"). */
+  footer?: string;
   highlights: string[];
 };

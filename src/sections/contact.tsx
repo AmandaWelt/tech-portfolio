@@ -1,4 +1,5 @@
 import React from "react";
+import { Github } from "lucide-react";
 
 type Props = {
   email: string;
@@ -6,6 +7,7 @@ type Props = {
   location: string;
   resumeUrl: string;
   resumeDownloadName?: string;
+  githubUrl?: string;
 };
 
 const Contact: React.FC<Props> = ({
@@ -13,7 +15,11 @@ const Contact: React.FC<Props> = ({
   location,
   resumeUrl,
   resumeDownloadName = "Resume.pdf",
-}) => (
+  githubUrl = "https://github.com/mandywelt",
+}) => {
+  const githubDisplay = githubUrl.replace(/^https?:\/\//i, "").replace(/\/$/, "");
+
+  return (
   <div className="max-w-6xl mx-auto">
     <div className="text-center mb-16">
       <h2 className="text-4xl md:text-5xl font-light tracking-wide mb-4">CONTACT</h2>
@@ -32,6 +38,20 @@ const Contact: React.FC<Props> = ({
             <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-2">EMAIL</h3>
             <a href={`mailto:${email}`} className="text-black hover:text-gray-600 transition-colors">
               {email}
+            </a>
+          </div>
+
+          <div>
+            <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-2">GITHUB</h3>
+            <a
+              href={githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-black hover:text-gray-600 transition-colors"
+              aria-label="GitHub profile (opens in new tab)"
+            >
+              <Github size={22} strokeWidth={1.25} aria-hidden />
+              <span className="font-light">{githubDisplay}</span>
             </a>
           </div>
 
@@ -81,6 +101,7 @@ const Contact: React.FC<Props> = ({
       </div>
     </div>
   </div>
-);
+  );
+};
 
 export default Contact;
