@@ -1,0 +1,436 @@
+/* Self-contained intro layer: scanlines, noise, glitch strips — GPU-friendly (opacity/transform). */
+
+.intro-root {
+  --intro-blue: #0000ff;
+  --intro-fg: #f2f0ec;
+  /* Mock workspace: solid black field (not Win95 teal). */
+  --intro-desktop: #000000;
+  --intro-bg: #000000;
+  --intro-black: #080808;
+  font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* --- Canvas: flat black field (mock) --- */
+.intro-address-bar {
+  box-shadow: 3px 4px 0 rgba(0, 0, 255, 0.28);
+}
+
+.intro-canvas {
+  background-color: #000;
+}
+
+/* Top-left loading window — mock: black chrome + light outer frame */
+.intro-loading-popup--dark > div:first-child {
+  border-color: #dedede;
+}
+
+/* Standalone virus/system slabs — thick white shell, no blue title bar */
+.intro-standalone-popup {
+  border: 3px solid #f5f5f5;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.88);
+}
+
+.intro-standalone-popup-body::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.12;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 2px,
+    rgba(255, 255, 255, 0.04) 2px,
+    rgba(255, 255, 255, 0.04) 3px
+  );
+}
+
+.intro-standalone-popup-body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Solid black workspace (mock). */
+.intro-retro-desktop {
+  z-index: 0;
+  background-color: #000;
+}
+
+.intro-retro-statusbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 3;
+  display: flex;
+  height: 24px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: #000;
+  padding: 0 10px 1px;
+}
+
+.intro-retro-statusbar-left {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.42em;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.intro-retro-statusbar-right {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.intro-retro-icons {
+  position: absolute;
+  left: 8px;
+  top: 30px;
+  bottom: 44px;
+  width: 76px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.intro-retro-desktop-icon {
+  display: block;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.intro-retro-taskbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 36px;
+  z-index: 4;
+  background: linear-gradient(180deg, #c3c7cd 0%, #9ea2a8 42%, #b9bdc4 100%);
+  border-top: 2px solid #fcfcfc;
+  border-bottom: 1px solid #1a1a1a;
+  box-shadow: inset 0 2px 0 #fff, inset 0 -1px 0 #5a5a5a;
+}
+
+.intro-retro-taskbar-inner {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  gap: 6px;
+  padding: 0 5px 1px;
+}
+
+.intro-retro-start {
+  border-width: 2px;
+  border-style: solid;
+  border-color: #fdfdfd #404040 #404040 #fdfdfd;
+  background: #c0c0c0;
+  padding: 1px 8px 2px;
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 1.1;
+  color: #0a0a0a;
+  font-family: Tahoma, "MS Sans Serif", sans-serif;
+}
+
+.intro-retro-task-pill {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-width: 2px;
+  border-style: solid;
+  border-color: #808080 #eaeaea #eaeaea #808080;
+  background: #9a9a9a;
+  padding: 2px 10px;
+  font-size: 10px;
+  color: #1a1a1a;
+  font-family: Tahoma, "MS Sans Serif", sans-serif;
+}
+
+.intro-retro-task-pill--active {
+  border-color: #404040 #fcfcfc #fcfcfc #404040;
+  background: #c0c0c0;
+}
+
+/* Heavy film grain — editorial print grit */
+.intro-film-grain {
+  z-index: 10;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.14;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.65'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+/* Popup tonal skins — A/B/C/D */
+.intro-popup--alert {
+  box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.88), 0 0 22px rgba(255, 255, 255, 0.04);
+}
+
+.intro-popup--art {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.9), 6px 8px 28px rgba(0, 0, 0, 0.7),
+    0 0 48px rgba(0, 71, 255, 0.14);
+}
+
+.intro-popup--hero {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.09), 10px 14px 36px rgba(0, 0, 0, 0.8),
+    0 0 72px rgba(0, 71, 255, 0.2), inset 0 0 100px rgba(0, 0, 0, 0.4);
+}
+
+.intro-popup--sticker {
+  box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.92), 0 0 20px rgba(255, 255, 255, 0.05);
+}
+
+.intro-popup-title-art {
+  text-shadow: 0 0 24px rgba(0, 0, 0, 0.45);
+}
+
+.intro-window-body--sticker::before {
+  opacity: 0.1;
+}
+
+.intro-window-body--art::before {
+  opacity: 0.18;
+}
+
+.intro-scanlines {
+  z-index: 11;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.022) 0px,
+    rgba(255, 255, 255, 0.022) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: screen;
+  opacity: 0.42;
+}
+
+.intro-noise {
+  z-index: 12;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0.11;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+.intro-glitch-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 71, 255, 0.35) 40%,
+    rgba(255, 255, 255, 0.25) 55%,
+    transparent 100%
+  );
+  opacity: 0.7;
+}
+
+.intro-vignette {
+  z-index: 13;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  /* Light edge falloff — keep field reading flat black like the mock. */
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.35);
+}
+
+.intro-boot-line {
+  letter-spacing: 0.35em;
+  font-size: 10px;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+}
+
+/* Per-window client area: faint CRT lines (under content via z-index). */
+.intro-window-body::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.14;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 2px,
+    rgba(255, 255, 255, 0.05) 2px,
+    rgba(255, 255, 255, 0.05) 3px
+  );
+}
+
+.intro-window-body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Chunky Win32-style push button (dark chrome). */
+.intro-win-button {
+  border-width: 2px;
+  border-style: solid;
+  border-color: #e8e8e8 #1a1a1a #1a1a1a #e8e8e8;
+  background: #0c0c0c;
+  box-shadow: inset -1px -1px 0 #2a2a2a;
+}
+
+.intro-win-button:active {
+  border-color: #1a1a1a #e8e8e8 #e8e8e8 #1a1a1a;
+  box-shadow: inset 1px 1px 0 #2a2a2a;
+}
+
+/* Fake “dither / CCTV” panel — no bitmap; CSS only. */
+.intro-dither-panel {
+  position: relative;
+  overflow: hidden;
+  background: #000;
+}
+
+.intro-dither-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+.intro-dither-halftone {
+  position: absolute;
+  inset: 0;
+  opacity: 0.25;
+  background-image: radial-gradient(circle, #fff 0.5px, transparent 0.6px);
+  background-size: 3px 3px;
+  mix-blend-mode: screen;
+}
+
+.intro-dither-silhouette {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 72%;
+  height: 88%;
+  transform: translateX(-50%);
+  background: radial-gradient(
+      ellipse 42% 70% at 50% 100%,
+      rgba(255, 255, 255, 0.22) 0%,
+      rgba(255, 255, 255, 0.06) 45%,
+      transparent 72%
+    ),
+    radial-gradient(ellipse 55% 35% at 30% 40%, rgba(255, 255, 255, 0.12), transparent 60%);
+  filter: contrast(1.35);
+}
+
+/* “Human” mass — head + shoulders as graphic shapes (no photo required). */
+.intro-dither-head {
+  position: absolute;
+  left: 34%;
+  top: 10%;
+  width: 32%;
+  height: 38%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse 50% 55% at 50% 50%,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.04) 55%,
+    transparent 72%
+  );
+  filter: contrast(1.2);
+}
+
+.intro-dither-smear {
+  position: absolute;
+  left: -5%;
+  right: -5%;
+  height: 14px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.12) 20%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 255, 255, 0.1) 80%,
+    transparent
+  );
+  mix-blend-mode: screen;
+  opacity: 0.55;
+}
+
+.intro-hero-portrait-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+  /* B&W + punch; halftone / scanline layers sit on top for print grit */
+  filter: grayscale(1) contrast(1.45) brightness(0.9);
+  opacity: 1;
+}
+
+.intro-dither-panel--hero .intro-dither-halftone {
+  opacity: 0.32;
+}
+
+/* When a real photo sits underneath, push halftone + noise so it reads like print. */
+.intro-dither-panel--photo .intro-dither-halftone {
+  opacity: 0.38;
+  mix-blend-mode: overlay;
+}
+
+.intro-dither-panel--photo::after {
+  opacity: 0.22;
+}
+
+/* Foreground ♥ Vicki: cleaner profile read vs heavy scanline stack behind */
+.intro-dither-panel--foreground.intro-dither-panel--photo::after {
+  opacity: 0.08;
+}
+
+.intro-dither-panel--foreground .intro-dither-halftone {
+  opacity: 0.16;
+  mix-blend-mode: soft-light;
+}
+
+.intro-dither-panel--foreground.intro-dither-panel--photo .intro-dither-halftone {
+  opacity: 0.2;
+}
+
+.intro-hero-portrait-img--foreground {
+  object-position: 38% 24%;
+  filter: grayscale(1) contrast(1.22) brightness(0.94);
+}
+
+.intro-dither-panel--hero::after {
+  opacity: 0.18;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-noise {
+    animation: none;
+  }
+}

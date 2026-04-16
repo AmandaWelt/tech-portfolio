@@ -2,6 +2,9 @@
   "name": "tech-portfolio",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -11,6 +14,7 @@
     "@types/node": "^16.7.13",
     "@types/react": "18.2.74",
     "@types/react-dom": "18.2.24",
+    "framer-motion": "^11.18.2",
     "lucide-react": "^0.511.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
