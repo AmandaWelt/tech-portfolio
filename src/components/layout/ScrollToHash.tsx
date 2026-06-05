@@ -2,15 +2,26 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { scrollToSection } from "../../lib/navScroll";
 
-/** Scroll to in-page section when the URL hash changes (e.g. /#work). */
+/** Scroll to top on route change; scroll to section when the URL has a hash. */
 const ScrollToHash: React.FC = () => {
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    if (!hash) return;
-    const id = hash.replace(/^#/, "");
-    const run = () => scrollToSection(`#${id}`);
-    requestAnimationFrame(run);
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
+
+  useEffect(() => {
+    if (hash) {
+      const id = hash.replace(/^#/, "");
+      if (!id) return;
+      const run = () => scrollToSection(`#${id}`, "auto");
+      requestAnimationFrame(() => requestAnimationFrame(run));
+      return;
+    }
+
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [pathname, hash]);
 
   return null;

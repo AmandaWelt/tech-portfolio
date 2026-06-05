@@ -1047,6 +1047,57 @@
     pointer-events: none;
   }
 
+  .split-hero-scroll-cue {
+    position: absolute;
+    bottom: clamp(1.25rem, 4vh, 2rem);
+    left: 50%;
+    z-index: 35;
+    display: flex;
+    height: 2.75rem;
+    width: 2.75rem;
+    -webkit-tap-highlight-color: transparent;
+    transform: translateX(-50%);
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(10, 14, 23, 0.55);
+    color: rgba(232, 238, 248, 0.88);
+    touch-action: manipulation;
+    pointer-events: auto;
+    backdrop-filter: blur(8px);
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .split-hero-scroll-cue:hover,
+  .split-hero-scroll-cue:focus-visible {
+    border-color: rgba(100, 255, 218, 0.45);
+    background: rgba(10, 14, 23, 0.72);
+    color: #e6f1ff;
+  }
+
+  .split-hero-scroll-cue__icon {
+    height: 1.35rem;
+    width: 1.35rem;
+    animation: hero-scroll-cue-bob 2.2s ease-in-out infinite;
+  }
+
+  @keyframes hero-scroll-cue-bob {
+    0%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.72;
+    }
+
+    50% {
+      transform: translateY(0.28rem);
+      opacity: 1;
+    }
+  }
+
   @media (max-width: 900px) {
     .split-hero-live-sketch {
       top: clamp(4rem, 12vh, 6.75rem);
@@ -1598,6 +1649,11 @@
   .project-backdrop__pin::after {
     animation: none !important;
     opacity: 0.35;
+  }
+
+  .split-hero-scroll-cue__icon {
+    animation: none;
+    opacity: 1;
   }
 
 }

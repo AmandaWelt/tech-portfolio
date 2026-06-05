@@ -4,6 +4,7 @@ import { site } from "../../data/profile";
 import { publicAsset } from "../../lib/publicAsset";
 import { isHeroInteractiveTarget } from "../../lib/navScroll";
 import BuildSideDeco from "./BuildSideDeco";
+import HeroScrollCue from "./HeroScrollCue";
 import SketchDrawOverlay from "./SketchDrawOverlay";
 import SplitHeroNav from "./SplitHeroNav";
 
@@ -195,6 +196,8 @@ const SplitHero: React.FC = () => {
       <div className="split-hero-handle" aria-hidden>
         <span className="split-hero-handle-grip" />
       </div>
+
+      <HeroScrollCue />
     </section>
   );
 };

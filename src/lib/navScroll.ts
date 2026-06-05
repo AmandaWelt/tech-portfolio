@@ -16,7 +16,8 @@ export function scrollToSection(hash: string, behavior: ScrollBehavior = "smooth
   return true;
 }
 
-export const HERO_INTERACTIVE_SELECTOR = ".split-hero-nav, .split-hero-copy, a, button";
+export const HERO_INTERACTIVE_SELECTOR =
+  ".split-hero-nav, .split-hero-copy, .split-hero-scroll-cue, a, button";
 
 export function isHeroInteractiveTarget(target: EventTarget | null): boolean {
   return target instanceof Element && Boolean(target.closest(HERO_INTERACTIVE_SELECTOR));
