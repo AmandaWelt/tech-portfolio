@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Restaurant Ops ,  Forecast</title>
+  <style>
+    :root{
+      --bg0:#0B0F14;
+      --bg1:#0F141B;
+      --glass0: rgba(22, 27, 35, .72);
+      --glass1: rgba(22, 27, 35, .58);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.06);
+      --text: rgba(235,245,255,.92);
+      --muted: rgba(235,245,255,.62);
+      --muted2: rgba(235,245,255,.45);
+
+      --good:#33e7ad;
+      --warn:#ffb74a;
+      --bad:#ff5c6c;
+      --info:#64b5ff;
+
+      --shadow: 0 18px 50px rgba(0,0,0,.55);
+      --r: 18px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1100px 700px at 55% 20%, rgba(51,231,173,.22), transparent 60%),
+        radial-gradient(900px 600px at 20% 78%, rgba(100,181,255,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      min-height:100vh;
+    }
+
+    .shell{max-width:1180px;margin:28px auto 48px;padding:0 18px;}
+
+    /* Top bar */
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:14px 16px;border:1px solid var(--stroke2);border-radius:999px;
+      background: linear-gradient(180deg, rgba(22,27,35,.60), rgba(22,27,35,.42));
+      box-shadow: var(--shadow);
+      position: sticky; top: 14px; z-index: 20;
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    }
+    .leftCluster,.rightCluster{display:flex;align-items:center;gap:10px;}
+    .hamb{
+      width:38px;height:38px;display:grid;place-items:center;
+      border-radius:12px;border:1px solid var(--stroke2);background: rgba(255,255,255,.03);
+      cursor:pointer;user-select:none;
+    }
+    .hamb:hover{background: rgba(255,255,255,.05)}
+    .pill{
+      display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:999px;
+      border:1px solid var(--stroke2);background: rgba(255,255,255,.04);
+    }
+    .iconDot{width:10px;height:10px;border-radius:99px;background: rgba(255,255,255,.12);box-shadow: 0 0 0 4px rgba(255,255,255,.03);}
+    .loc{display:flex;align-items:center;gap:8px;font-weight:600;letter-spacing:.2px;}
+    .caret{opacity:.7;font-size:12px;transform: translateY(-1px);}
+    .tag{
+      font-size:12px;color:var(--muted);padding:6px 10px;border:1px solid var(--stroke2);
+      border-radius:999px;background: rgba(255,255,255,.03);
+    }
+
+    .tabs{
+      display:flex;gap:8px;padding:6px;border-radius:999px;border:1px solid var(--stroke2);
+      background: rgba(0,0,0,.15);
+    }
+    .tab{
+      appearance:none;border:1px solid transparent;background:transparent;color:var(--muted);
+      padding:10px 14px;border-radius:999px;font-weight:700;cursor:pointer;letter-spacing:.2px;
+    }
+    .tab:hover{color:var(--text);background: rgba(255,255,255,.04)}
+    .tab.active{
+      color: var(--text);
+      border-color: rgba(51,231,173,.22);
+      background: linear-gradient(180deg, rgba(51,231,173,.14), rgba(255,255,255,.03));
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    /* Grid */
+    .grid{display:grid;gap:16px;margin-top:18px;}
+    .grid.cols2{grid-template-columns: 1.2fr .8fr;}
+    .grid.cols3{grid-template-columns: 1fr 1fr 1fr;}
+    .grid.cols1{grid-template-columns: 1fr;}
+    @media (max-width: 980px){ .grid.cols2,.grid.cols3{grid-template-columns:1fr;} }
+
+    /* Cards */
+    .card{
+      border-radius: var(--r);
+      border: 1px solid var(--stroke2);
+      background: linear-gradient(180deg, var(--glass0), var(--glass1));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      overflow:hidden; position:relative;
+    }
+    .card::before{
+      content:""; position:absolute; inset:-1px; border-radius:inherit; pointer-events:none;
+      background: radial-gradient(900px 260px at 50% -40%, rgba(51,231,173,.22), transparent 60%);
+      opacity:.8;
+    }
+    .card > *{position:relative}
+    .cardHeader{
+      padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .hTitle{
+      font-weight:800;letter-spacing:.5px;font-size:13px;color: rgba(235,245,255,.72);
+      text-transform: uppercase;
+    }
+    .hSub{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.35;max-width:60ch;}
+    .cardBody{padding:14px 16px;}
+
+    .row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .col{display:flex;flex-direction:column;gap:6px;}
+    .tiny{font-size:12px;color:var(--muted2);}
+    .muted{color:var(--muted);}
+    .kpi{font-size:38px;font-weight:900;letter-spacing:-.6px;line-height:1;}
+    .kpiSmall{font-size:20px;font-weight:800;letter-spacing:-.2px;}
+
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;font-weight:800;
+      padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);font-size:12px;
+    }
+    .b-good{color: rgba(51,231,173,.95); border-color: rgba(51,231,173,.22); background: rgba(51,231,173,.10)}
+    .b-warn{color: rgba(255,183,74,.98); border-color: rgba(255,183,74,.22); background: rgba(255,183,74,.08)}
+    .b-bad {color: rgba(255,92,108,.98); border-color: rgba(255,92,108,.22); background: rgba(255,92,108,.08)}
+    .b-info{color: rgba(100,181,255,.95); border-color: rgba(100,181,255,.22); background: rgba(100,181,255,.08)}
+
+    /* Callout + actions */
+    .callout{
+      display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+      padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.22);
+    }
+    .callout h3{margin:0;font-size:16px;letter-spacing:.2px;}
+    .callout p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.35;}
+    .callout .right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+    .btn{
+      appearance:none;border:1px solid rgba(255,255,255,.10);background: rgba(255,255,255,.04);
+      color:var(--text);padding:11px 14px;border-radius:14px;font-weight:800;
+      cursor:pointer;letter-spacing:.2px;display:inline-flex;align-items:center;gap:10px;min-height:42px;
+    }
+    .btn:hover{background: rgba(255,255,255,.06)}
+    .btn.primary{border-color: rgba(100,181,255,.28);background: linear-gradient(180deg, rgba(100,181,255,.22), rgba(255,255,255,.03));}
+    .btn.safe{border-color: rgba(51,231,173,.26);background: linear-gradient(180deg, rgba(51,231,173,.18), rgba(255,255,255,.03));}
+
+    /* Drivers */
+    .drivers{display:grid;grid-template-columns: 1fr 1fr;gap:10px;margin-top:10px;}
+    @media (max-width: 620px){ .drivers{grid-template-columns:1fr;} }
+    .driver{
+      padding:12px;border-radius:16px;border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+    }
+    .driverTop{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+    .driver b{font-size:13px}
+    .driver .desc{margin-top:6px;font-size:12px;color:var(--muted);line-height:1.35;}
+    .impact{
+      font-size:12px;font-weight:900;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .impact.pos{color: rgba(51,231,173,.95);border-color: rgba(51,231,173,.22);background: rgba(51,231,173,.08)}
+    .impact.neg{color: rgba(255,92,108,.95);border-color: rgba(255,92,108,.22);background: rgba(255,92,108,.08)}
+    .impact.neu{color: rgba(100,181,255,.92);border-color: rgba(100,181,255,.22);background: rgba(100,181,255,.08)}
+
+    /* Confidence */
+    .meter{
+      margin-top:10px;border-radius:14px;border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.20);padding:12px;
+    }
+    .bar{height:10px;background: rgba(255,255,255,.08);border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.08);}
+    .fill{height:100%;width: 82%;background: linear-gradient(90deg, rgba(51,231,173,.75), rgba(100,181,255,.55));border-radius:999px;}
+    .meterRow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:10px;color:var(--muted);font-size:12px;}
+
+    /* Scenario sliders */
+    .scenarioGrid{display:grid;grid-template-columns: 1fr 1fr;gap:12px;}
+    @media (max-width: 980px){ .scenarioGrid{grid-template-columns:1fr;} }
+    .panel{
+      border-radius:16px;border:1px solid rgba(255,255,255,.08);background: rgba(0,0,0,.18);
+      padding:12px;
+    }
+    .control{display:flex;flex-direction:column;gap:8px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+    .control:last-child{border-bottom:none;}
+    .controlTop{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .control label{font-size:12px;color:var(--muted);text-transform: uppercase;letter-spacing:.35px;font-weight:800;}
+    .control .val{font-size:12px;font-weight:900;color: rgba(235,245,255,.86);padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.10);background: rgba(255,255,255,.03);}
+    input[type="range"]{width:100%;}
+    .hint{font-size:12px;color: var(--muted2);line-height:1.35;margin-top:8px;}
+
+    /* Targets / rules list */
+    .list{display:flex;flex-direction:column;gap:10px;margin-top:12px;}
+    .item{
+      display:flex;justify-content:space-between;gap:12px;
+      padding:12px;border-radius:16px;border:1px solid rgba(255,255,255,.08);background: rgba(0,0,0,.18);
+    }
+    .item b{font-size:13px}
+    .item span{font-size:12px;color:var(--muted)}
+    .rightText{text-align:right;}
+
+    .hidden{display:none !important;}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="leftCluster">
+        <div class="hamb" title="Menu">☰</div>
+        <div class="pill">
+          <div class="loc">
+            <span class="iconDot"></span>
+            <span>Location</span>
+            <span class="caret">▼</span>
+          </div>
+          <span class="tag">Fri, Feb 6 • 45° Cloudy</span>
+        </div>
+      </div>
+
+      <div class="rightCluster">
+        <div class="tabs" role="tablist" aria-label="Forecast Views">
+          <button class="tab active" data-view="overview" role="tab" aria-selected="true">Overview</button>
+          <button class="tab" data-view="scenario" role="tab" aria-selected="false">Scenario</button>
+          <button class="tab" data-view="targets" role="tab" aria-selected="false">Targets & Alerts</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <section id="view-overview" class="view">
+      <div class="grid cols2">
+        <div class="card">
+          <div class="cardHeader">
+            <div>
+              <div class="hTitle">Forecast Overview</div>
+              <div class="hSub">A forecast that explains itself: what’s expected, what’s driving it, and what you should do next.</div>
+            </div>
+            <div class="badge b-good">✓ High Confidence</div>
+          </div>
+
+          <div class="cardBody">
+            <div class="callout">
+              <div>
+                <h3>Projected Sales: <span id="salesKpi">$12.8K</span></h3>
+                <p><b>AI note:</b> Mild temps + light cloud cover typically lift walk-in traffic. Local event adds a measurable bump during dinner.</p>
+              </div>
+              <div class="right">
+                <div class="badge b-info">vs LY +6.5%</div>
+                <div class="badge b-warn">Dinner peak ↑</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn safe" data-jump="scenario"> to  Run a Scenario</button>
+              <button class="btn primary">View Full Forecast</button>
+            </div>
+
+            <div class="meter">
+              <div class="row">
+                <div class="col">
+                  <div class="hTitle" style="margin:0;font-size:12px">Confidence</div>
+                  <div class="tiny">Based on weather certainty, historical similarity, and event signal strength</div>
+                </div>
+                <div class="badge b-good" id="confBadge">82 / 100</div>
+              </div>
+              <div style="height:10px"></div>
+              <div class="bar"><div class="fill" id="confFill"></div></div>
+              <div class="meterRow">
+                <span id="confLabel">High confidence (stable signals)</span>
+                <span id="confExplain">low volatility</span>
+              </div>
+            </div>
+
+            <div style="height:10px"></div>
+            <div class="hTitle">Drivers</div>
+            <div class="drivers">
+              <div class="driver">
+                <div class="driverTop">
+                  <b>Weather</b>
+                  <span class="impact pos" id="wxImpact">+4.0%</span>
+                </div>
+                <div class="desc">Mild conditions usually increase dine-in and reduce cancellations.</div>
+              </div>
+              <div class="driver">
+                <div class="driverTop">
+                  <b>Local Event</b>
+                  <span class="impact pos" id="eventImpact">+2.0%</span>
+                </div>
+                <div class="desc">Dinner traffic lift concentrated 6-8 PM near venue radius.</div>
+              </div>
+              <div class="driver">
+                <div class="driverTop">
+                  <b>Promo / Marketing</b>
+                  <span class="impact neu" id="promoImpact">+0.5%</span>
+                </div>
+                <div class="desc">Small bump if promo is active; strongest if pushed before lunch.</div>
+              </div>
+              <div class="driver">
+                <div class="driverTop">
+                  <b>Seasonality</b>
+                  <span class="impact neu" id="seasonImpact">0.0%</span>
+                </div>
+                <div class="desc">Neutral relative to last month’s baseline for this day-of-week.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardHeader">
+            <div>
+              <div class="hTitle">Forecast Summary</div>
+              <div class="hSub">Actionable highlights that connect directly to staffing decisions.</div>
+            </div>
+            <div class="badge b-warn">▲ Peak risk</div>
+          </div>
+
+          <div class="cardBody">
+            <div class="list">
+              <div class="item">
+                <div>
+                  <b>Lunch</b>
+                  <span>Steady demand • normal variance</span>
+                </div>
+                <div class="rightText">
+                  <div class="badge b-good">Stable</div>
+                  <div class="tiny">11-2</div>
+                </div>
+              </div>
+              <div class="item">
+                <div>
+                  <b>Dinner</b>
+                  <span>Event lift • higher walk-in probability</span>
+                </div>
+                <div class="rightText">
+                  <div class="badge b-warn">Busy</div>
+                  <div class="tiny">6-8</div>
+                </div>
+              </div>
+              <div class="item">
+                <div>
+                  <b>Late</b>
+                  <span>Drop-off expected • optional early cuts</span>
+                </div>
+                <div class="rightText">
+                  <div class="badge b-info">Watch</div>
+                  <div class="tiny">9+</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn safe"> to  Send to Staffing</button>
+              <button class="btn">Export Summary</button>
+            </div>
+
+            <div class="hint">Prototype note: “Send to Staffing” would deep-link into recommended coverage windows and suggested adds/cuts.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENARIO -->
+    <section id="view-scenario" class="view hidden">
+      <div class="grid cols1">
+        <div class="card">
+          <div class="cardHeader">
+            <div>
+              <div class="hTitle">Scenario Mode</div>
+              <div class="hSub">Simple “what if” simulation. The point isn’t perfect accuracy ,  it’s fast decision support with explainable drivers.</div>
+            </div>
+            <div class="badge b-info">Interactive</div>
+          </div>
+
+          <div class="cardBody">
+            <div class="scenarioGrid">
+              <div class="panel">
+                <div class="hTitle">Inputs</div>
+
+                <div class="control">
+                  <div class="controlTop">
+                    <label>Rain (chance)</label>
+                    <div class="val" id="rainVal">20%</div>
+                  </div>
+                  <input id="rain" type="range" min="0" max="100" value="20" />
+                </div>
+
+                <div class="control">
+                  <div class="controlTop">
+                    <label>Temperature</label>
+                    <div class="val" id="tempVal">45°</div>
+                  </div>
+                  <input id="temp" type="range" min="10" max="95" value="45" />
+                </div>
+
+                <div class="control">
+                  <div class="controlTop">
+                    <label>Local Event Strength</label>
+                    <div class="val" id="evtVal">Medium</div>
+                  </div>
+                  <input id="event" type="range" min="0" max="2" value="1" />
+                </div>
+
+                <div class="control">
+                  <div class="controlTop">
+                    <label>Promo Active</label>
+                    <div class="val" id="promoVal">Off</div>
+                  </div>
+                  <input id="promo" type="range" min="0" max="1" value="0" />
+                </div>
+
+                <div class="actions">
+                  <button class="btn safe" id="reset">Reset</button>
+                  <button class="btn primary">Save Scenario</button>
+                </div>
+
+                <div class="hint">Model logic is intentionally simple for the prototype. We can tighten it later with real baselines per store + weather history.</div>
+              </div>
+
+              <div class="panel">
+                <div class="hTitle">Output</div>
+
+                <div class="callout" style="margin-top:10px;">
+                  <div>
+                    <h3>Projected Sales: <span id="scenarioSales">$12.8K</span></h3>
+                    <p id="scenarioExplain"><b>AI note:</b> Mild weather + local event produces a dinner lift.</p>
+                  </div>
+                  <div class="right">
+                    <div class="badge b-info" id="scenarioVs">vs base +0.0%</div>
+                    <div class="badge b-good" id="scenarioConf">Confidence: 82</div>
+                  </div>
+                </div>
+
+                <div class="drivers" style="margin-top:12px;">
+                  <div class="driver">
+                    <div class="driverTop">
+                      <b>Weather Impact</b>
+                      <span class="impact" id="sWxImpact">+0.0%</span>
+                    </div>
+                    <div class="desc" id="sWxDesc">, </div>
+                  </div>
+
+                  <div class="driver">
+                    <div class="driverTop">
+                      <b>Event Impact</b>
+                      <span class="impact" id="sEvtImpact">+0.0%</span>
+                    </div>
+                    <div class="desc" id="sEvtDesc">, </div>
+                  </div>
+
+                  <div class="driver">
+                    <div class="driverTop">
+                      <b>Promo Impact</b>
+                      <span class="impact" id="sPromoImpact">+0.0%</span>
+                    </div>
+                    <div class="desc" id="sPromoDesc">, </div>
+                  </div>
+
+                  <div class="driver">
+                    <div class="driverTop">
+                      <b>Risk Note</b>
+                      <span class="impact neg" id="sRisk">, </span>
+                    </div>
+                    <div class="desc" id="sRiskDesc">, </div>
+                  </div>
+                </div>
+
+                <div class="actions">
+                  <button class="btn safe"> to  Send to Staffing</button>
+                  <button class="btn">Share</button>
+                </div>
+
+                <div class="hint">“Send to Staffing” would pre-fill recommended adds/cuts based on the new projection.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TARGETS -->
+    <section id="view-targets" class="view hidden">
+      <div class="grid cols2">
+        <div class="card">
+          <div class="cardHeader">
+            <div>
+              <div class="hTitle">Targets & Alerts</div>
+              <div class="hSub">Set guardrails so the forecast automatically becomes an operational early warning system.</div>
+            </div>
+            <div class="badge b-good">✓ Enabled</div>
+          </div>
+
+          <div class="cardBody">
+            <div class="callout">
+              <div>
+                <h3>Drift alert: dinner over plan</h3>
+                <p><b>AI note:</b> Event lift pushes projected demand above coverage plan. Recommend adding 1 BOH and 1 FOH during 6-8 PM.</p>
+              </div>
+              <div class="right">
+                <div class="badge b-warn">Dinner ↑</div>
+                <div class="badge b-info">6-8 PM</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn safe"> to  Create Staffing Recommendation</button>
+              <button class="btn primary">View Alert Inbox</button>
+            </div>
+
+            <div style="height:10px"></div>
+            <div class="hTitle">Active Alerts</div>
+            <div class="list">
+              <div class="item">
+                <div>
+                  <b>Forecast volatility</b>
+                  <span>Rain uncertainty high • keep schedule flexible</span>
+                </div>
+                <div class="rightText">
+                  <div class="badge b-info">Info</div>
+                  <div class="tiny">watch</div>
+                </div>
+              </div>
+              <div class="item">
+                <div>
+                  <b>Event spike</b>
+                  <span>Dinner lift above plan threshold</span>
+                </div>
+                <div class="rightText">
+                  <div class="badge b-warn">Warn</div>
+                  <div class="tiny">act</div>
+                </div>
+              </div>
+              <div class="item">
+                <div>
+                  <b>Low demand window</b>
+                  <span>Projected lull • optional early cuts 3-4:30</span>
+                </div>
+                <div class="rightText">
+                  <div class="badge b-good">Opportunity</div>
+                  <div class="tiny">save</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardHeader">
+            <div>
+              <div class="hTitle">Rules</div>
+              <div class="hSub">Tiny rules that unlock huge calm.</div>
+            </div>
+            <div class="badge b-info">Editable</div>
+          </div>
+
+          <div class="cardBody">
+            <div class="list">
+              <div class="item">
+                <div>
+                  <b>Event Lift Threshold</b>
+                  <span>Warn when event impact ≥ +1.5%</span>
+                </div>
+                <div class="rightText">
+                  <div class="badge b-warn">1.5%</div>
+                  <div class="tiny">active</div>
+                </div>
+              </div>
+
+              <div class="item">
+                <div>
+                  <b>Rain Uncertainty</b>
+                  <span>Info when rain chance between 35-65%</span>
+                </div>
+                <div class="rightText">
+                  <div class="badge b-info">35-65</div>
+                  <div class="tiny">active</div>
+                </div>
+              </div>
+
+              <div class="item">
+                <div>
+                  <b>Forecast Confidence</b>
+                  <span>Warn when confidence &lt; 70</span>
+                </div>
+                <div class="rightText">
+                  <div class="badge b-warn">&lt; 70</div>
+                  <div class="tiny">active</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary">Edit Rules</button>
+              <button class="btn">Snooze</button>
+            </div>
+
+            <div class="hint">In the real system, these rules would be per-location and tied to notification channels (SMS, push, email).</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // Tabs / Views
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const views = {
+      overview: document.getElementById("view-overview"),
+      scenario: document.getElementById("view-scenario"),
+      targets: document.getElementById("view-targets"),
+    };
+
+    function showView(key){
+      Object.values(views).forEach(v => v.classList.add("hidden"));
+      views[key].classList.remove("hidden");
+      tabs.forEach(t => {
+        const isActive = t.dataset.view === key;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    tabs.forEach(t => t.addEventListener("click", () => showView(t.dataset.view)));
+    document.querySelectorAll("[data-jump]").forEach(btn => btn.addEventListener("click", () => showView(btn.dataset.jump)));
+
+    // --- Scenario Model (simple + explainable) ---
+    const BASE_SALES = 12800; // base dollars
+    const els = {
+      rain: document.getElementById("rain"),
+      temp: document.getElementById("temp"),
+      event: document.getElementById("event"),
+      promo: document.getElementById("promo"),
+      rainVal: document.getElementById("rainVal"),
+      tempVal: document.getElementById("tempVal"),
+      evtVal: document.getElementById("evtVal"),
+      promoVal: document.getElementById("promoVal"),
+      scenarioSales: document.getElementById("scenarioSales"),
+      scenarioVs: document.getElementById("scenarioVs"),
+      scenarioConf: document.getElementById("scenarioConf"),
+      scenarioExplain: document.getElementById("scenarioExplain"),
+      sWxImpact: document.getElementById("sWxImpact"),
+      sEvtImpact: document.getElementById("sEvtImpact"),
+      sPromoImpact: document.getElementById("sPromoImpact"),
+      sWxDesc: document.getElementById("sWxDesc"),
+      sEvtDesc: document.getElementById("sEvtDesc"),
+      sPromoDesc: document.getElementById("sPromoDesc"),
+      sRisk: document.getElementById("sRisk"),
+      sRiskDesc: document.getElementById("sRiskDesc"),
+      reset: document.getElementById("reset"),
+    };
+
+    function fmtMoney(n){
+      if (n >= 1000) return "$" + (n/1000).toFixed(1) + "K";
+      return "$" + Math.round(n).toString();
+    }
+    function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+    function compute(){
+      const rain = Number(els.rain.value);       // 0..100
+      const temp = Number(els.temp.value);       // 10..95
+      const evt = Number(els.event.value);       // 0..2
+      const promo = Number(els.promo.value);     // 0..1
+
+      // Weather impact:
+      // - mild temps (45-75) positive
+      // - high rain chance negative
+      let tempScore = 0;
+      if (temp < 35) tempScore = -1.8;
+      else if (temp < 45) tempScore = -0.7;
+      else if (temp <= 75) tempScore = +1.2;
+      else if (temp <= 85) tempScore = +0.2;
+      else tempScore = -0.8;
+
+      let rainScore = 0;
+      if (rain < 20) rainScore = +0.8;
+      else if (rain < 40) rainScore = +0.2;
+      else if (rain < 65) rainScore = -0.8;
+      else rainScore = -1.7;
+
+      const wxImpact = tempScore + rainScore; // percentage
+
+      // Event impact (0/1/2): none/medium/strong
+      const evtImpact = evt === 0 ? 0 : (evt === 1 ? 2.0 : 3.6);
+
+      // Promo impact
+      const promoImpact = promo ? 0.8 : 0.0;
+
+      const totalPct = wxImpact + evtImpact + promoImpact;
+      const projected = BASE_SALES * (1 + totalPct/100);
+
+      // Confidence model: drops when rain is uncertain (35-65) or event is strong but not confirmed
+      let conf = 84;
+      if (rain >= 35 && rain <= 65) conf -= 12;
+      if (rain > 80) conf -= 6;
+      if (evt === 2) conf -= 6; // big event = more volatility
+      conf = clamp(conf, 45, 92);
+
+      // UI labels
+      els.rainVal.textContent = rain + "%";
+      els.tempVal.textContent = temp + "°";
+      els.evtVal.textContent = evt === 0 ? "None" : (evt === 1 ? "Medium" : "Strong");
+      els.promoVal.textContent = promo ? "On" : "Off";
+
+      els.scenarioSales.textContent = fmtMoney(projected);
+      els.scenarioVs.textContent = "vs base " + (totalPct >= 0 ? "+" : "") + totalPct.toFixed(1) + "%";
+      els.scenarioConf.textContent = "Confidence: " + Math.round(conf);
+
+      // Driver readouts
+      setImpact(els.sWxImpact, wxImpact);
+      setImpact(els.sEvtImpact, evtImpact);
+      setImpact(els.sPromoImpact, promoImpact);
+
+      els.sWxDesc.textContent =
+        (wxImpact >= 0 ? "Weather supports walk-ins." : "Weather likely reduces walk-ins.") +
+        ` (temp ${temp}°, rain ${rain}%)`;
+
+      els.sEvtDesc.textContent =
+        evt === 0 ? "No event signal detected." :
+        evt === 1 ? "Moderate dinner lift expected near venue radius." :
+                    "Strong lift likely. Expect concentrated spike 6-8 PM.";
+
+      els.sPromoDesc.textContent =
+        promo ? "Promo active: small lift if pushed before lunch." : "Promo off: no direct lift.";
+
+      // Risk note
+      if (conf < 70){
+        els.sRisk.textContent = "VOLATILE";
+        els.sRisk.className = "impact neg";
+        els.sRiskDesc.textContent = "Forecast confidence is low. Keep schedule flexible; avoid aggressive cuts.";
+      } else if (totalPct > 3.5){
+        els.sRisk.textContent = "BUSY";
+        els.sRisk.className = "impact pos";
+        els.sRiskDesc.textContent = "Demand likely above plan. Consider adding coverage during peak windows.";
+      } else {
+        els.sRisk.textContent = "STABLE";
+        els.sRisk.className = "impact neu";
+        els.sRiskDesc.textContent = "Signals are stable. Staffing plan should hold with minor adjustments.";
+      }
+
+      // Scenario explainer
+      els.scenarioExplain.innerHTML =
+        `<b>AI note:</b> Weather impact <b>${wxImpact >= 0 ? "+" : ""}${wxImpact.toFixed(1)}%</b>, event impact <b>+${evtImpact.toFixed(1)}%</b>, promo <b>+${promoImpact.toFixed(1)}%</b>.`;
+
+      // Sync overview badges lightly (optional polish)
+      syncOverview(conf, totalPct);
+    }
+
+    function setImpact(el, pct){
+      const sign = pct >= 0 ? "+" : "";
+      el.textContent = sign + pct.toFixed(1) + "%";
+      if (pct > 0.2) el.className = "impact pos";
+      else if (pct < -0.2) el.className = "impact neg";
+      else el.className = "impact neu";
+    }
+
+    function syncOverview(conf, totalPct){
+      const confFill = document.getElementById("confFill");
+      const confBadge = document.getElementById("confBadge");
+      const confLabel = document.getElementById("confLabel");
+      const confExplain = document.getElementById("confExplain");
+      const salesKpi = document.getElementById("salesKpi");
+
+      confFill.style.width = clamp(conf, 0, 100) + "%";
+      confBadge.textContent = Math.round(conf) + " / 100";
+
+      const projected = BASE_SALES * (1 + totalPct/100);
+      salesKpi.textContent = fmtMoney(projected);
+
+      let label = "High confidence (stable signals)";
+      let explain = "low volatility";
+      if (conf < 70){ label = "Medium confidence (mixed signals)"; explain = "plan for variance"; }
+      if (conf < 58){ label = "Low confidence (volatile signals)"; explain = "avoid hard cuts"; }
+
+      confLabel.textContent = label;
+      confExplain.textContent = explain;
+    }
+
+    // Bind inputs
+    ["rain","temp","event","promo"].forEach(id => {
+      document.getElementById(id).addEventListener("input", compute);
+    });
+
+    // Reset
+    els.reset.addEventListener("click", () => {
+      els.rain.value = 20;
+      els.temp.value = 45;
+      els.event.value = 1;
+      els.promo.value = 0;
+      compute();
+    });
+
+    // Init
+    compute();
+  </script>
+</body>
+</html>

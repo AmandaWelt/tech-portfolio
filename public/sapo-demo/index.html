@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SAPO ,  Interactive Prototypes</title>
+    <style>
+      :root {
+        --bg: #0d1a1f;
+        --card: #152830;
+        --stroke: rgba(255, 255, 255, 0.1);
+        --text: #eaf0f7;
+        --muted: rgba(234, 240, 247, 0.62);
+        --accent: #3dd6c3;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: system-ui, -apple-system, sans-serif;
+        background: radial-gradient(1200px 600px at 50% -10%, rgba(61, 214, 195, 0.12), transparent), var(--bg);
+        color: var(--text);
+        padding: 2rem 1.25rem 3rem;
+      }
+      .wrap {
+        max-width: 720px;
+        margin: 0 auto;
+      }
+      h1 {
+        font-size: clamp(1.75rem, 4vw, 2.25rem);
+        font-weight: 500;
+        margin: 0 0 0.5rem;
+      }
+      .lede {
+        color: var(--muted);
+        line-height: 1.6;
+        margin: 0 0 2rem;
+        max-width: 52ch;
+      }
+      .grid {
+        display: grid;
+        gap: 0.75rem;
+      }
+      a.card {
+        display: block;
+        padding: 1.1rem 1.25rem;
+        border-radius: 12px;
+        border: 1px solid var(--stroke);
+        background: var(--card);
+        color: inherit;
+        text-decoration: none;
+        transition: border-color 0.15s, transform 0.15s;
+      }
+      a.card:hover {
+        border-color: rgba(61, 214, 195, 0.45);
+        transform: translateY(-1px);
+      }
+      .card-title {
+        font-size: 1.05rem;
+        font-weight: 500;
+        margin: 0 0 0.35rem;
+      }
+      .card-desc {
+        font-size: 0.9rem;
+        color: var(--muted);
+        margin: 0;
+        line-height: 1.5;
+      }
+      .tag {
+        display: inline-block;
+        margin-top: 0.65rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      .back {
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        font-size: 0.875rem;
+        color: var(--muted);
+        text-decoration: none;
+      }
+      .back:hover {
+        color: var(--text);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <a class="back" href="../">← Back to portfolio</a>
+      <h1>SAPO prototypes</h1>
+      <p class="lede">
+        Interactive HTML explorations that informed the Expo command center, forecast scenarios, staffing
+        execution, and responsive workforce dashboards.
+      </p>
+      <div class="grid">
+        <a class="card" href="tablet.html">
+          <p class="card-title">Workforce dashboard</p>
+          <p class="card-desc">Tablet layout with expanded cards and ops navigation patterns.</p>
+          <span class="tag">Tablet</span>
+        </a>
+        <a class="card" href="forecast.html">
+          <p class="card-title">Restaurant ops ,  Forecast</p>
+          <p class="card-desc">Scenario modeling, confidence bands, and driver impact for demand planning.</p>
+          <span class="tag">Forecast</span>
+        </a>
+        <a class="card" href="scheduler.html">
+          <p class="card-title">Restaurant ops ,  Staffing</p>
+          <p class="card-desc">Coverage scoring, open-shift fixes, and schedule editor workflows.</p>
+          <span class="tag">Staffing</span>
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

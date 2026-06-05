@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Restaurant Ops ,  Staffing</title>
+  <style>
+    :root{
+      --bg0:#0B0F14;
+      --bg1:#0F141B;
+      --glass0: rgba(22, 27, 35, .72);
+      --glass1: rgba(22, 27, 35, .58);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.06);
+      --text: rgba(235,245,255,.92);
+      --muted: rgba(235,245,255,.62);
+      --muted2: rgba(235,245,255,.45);
+      --good:#33e7ad;
+      --warn:#ffb74a;
+      --bad:#ff5c6c;
+      --info:#64b5ff;
+      --shadow: 0 18px 50px rgba(0,0,0,.55);
+      --r: 18px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(1100px 700px at 55% 20%, rgba(51,231,173,.22), transparent 60%),
+        radial-gradient(900px 600px at 25% 70%, rgba(100,181,255,.12), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      min-height:100vh;
+    }
+
+    .shell{
+      max-width: 1180px;
+      margin: 28px auto 48px;
+      padding: 0 18px;
+    }
+
+    /* Top bar */
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding: 14px 16px;
+      border:1px solid var(--stroke2);
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(22,27,35,.60), rgba(22,27,35,.42));
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 14px;
+      z-index: 20;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .leftCluster, .rightCluster{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .pill{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border:1px solid var(--stroke2);
+      background: rgba(255,255,255,.04);
+    }
+
+    .hamb{
+      width: 38px; height: 38px;
+      display:grid; place-items:center;
+      border-radius: 12px;
+      border:1px solid var(--stroke2);
+      background: rgba(255,255,255,.03);
+      cursor:pointer;
+      user-select:none;
+    }
+    .hamb:hover{background: rgba(255,255,255,.05)}
+
+    .loc{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-weight:600;
+      letter-spacing:.2px;
+    }
+    .caret{
+      opacity:.7;
+      font-size: 12px;
+      transform: translateY(-1px);
+    }
+
+    .tag{
+      font-size: 12px;
+      color: var(--muted);
+      padding: 6px 10px;
+      border:1px solid var(--stroke2);
+      border-radius: 999px;
+      background: rgba(255,255,255,.03);
+      white-space:nowrap;
+    }
+
+    .tabs{
+      display:flex;
+      gap:8px;
+      padding: 6px;
+      border-radius: 999px;
+      border:1px solid var(--stroke2);
+      background: rgba(0,0,0,.15);
+    }
+    .tab{
+      appearance:none;
+      border:1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight:600;
+      cursor:pointer;
+      letter-spacing:.2px;
+      white-space:nowrap;
+    }
+    .tab:hover{color: var(--text); background: rgba(255,255,255,.04)}
+    .tab.active{
+      color: var(--text);
+      border-color: rgba(51,231,173,.22);
+      background: linear-gradient(180deg, rgba(51,231,173,.14), rgba(255,255,255,.03));
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    .iconDot{
+      width:10px; height:10px;
+      border-radius: 99px;
+      background: rgba(255,255,255,.12);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.03);
+    }
+
+    /* Layout */
+    .grid{
+      display:grid;
+      gap:16px;
+      margin-top: 18px;
+    }
+    .grid.cols2{grid-template-columns: 1.2fr .8fr;}
+    .grid.cols3{grid-template-columns: 1fr 1fr 1fr;}
+    .grid.cols1{grid-template-columns: 1fr;}
+    @media (max-width: 980px){
+      .grid.cols2,.grid.cols3{grid-template-columns: 1fr;}
+      .tag{display:none;}
+    }
+
+    /* Cards */
+    .card{
+      border-radius: var(--r);
+      border: 1px solid var(--stroke2);
+      background: linear-gradient(180deg, var(--glass0), var(--glass1));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      overflow:hidden;
+      position:relative;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius: inherit;
+      pointer-events:none;
+      background: radial-gradient(900px 260px at 50% -40%, rgba(51,231,173,.22), transparent 60%);
+      opacity:.8;
+    }
+    .card > *{position:relative}
+
+    .cardHeader{
+      padding: 14px 16px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .hTitle{
+      font-weight: 800;
+      letter-spacing: .5px;
+      font-size: 13px;
+      color: rgba(235,245,255,.72);
+      text-transform: uppercase;
+    }
+    .hSub{
+      margin-top:6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      max-width: 56ch;
+    }
+    .cardBody{padding: 14px 16px;}
+
+    .row{display:flex; align-items:center; justify-content:space-between; gap:12px;}
+    .col{display:flex; flex-direction:column; gap:6px;}
+    .muted{color: var(--muted)}
+    .tiny{font-size: 12px; color: var(--muted2)}
+    .kpi{font-size: 38px; font-weight: 900; letter-spacing: -.6px; line-height: 1;}
+    .kpiSmall{font-size: 20px; font-weight: 800; letter-spacing: -.2px;}
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-weight:800;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      font-size: 12px;
+      white-space:nowrap;
+    }
+    .b-good{color: rgba(51,231,173,.95); border-color: rgba(51,231,173,.22); background: rgba(51,231,173,.10)}
+    .b-warn{color: rgba(255,183,74,.98); border-color: rgba(255,183,74,.22); background: rgba(255,183,74,.08)}
+    .b-bad {color: rgba(255,92,108,.98); border-color: rgba(255,92,108,.22); background: rgba(255,92,108,.08)}
+    .b-info{color: rgba(100,181,255,.95); border-color: rgba(100,181,255,.22); background: rgba(100,181,255,.08)}
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 12px;
+    }
+    .btn{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      padding: 11px 14px;
+      border-radius: 14px;
+      font-weight: 800;
+      cursor:pointer;
+      letter-spacing: .2px;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      min-height: 42px;
+      user-select:none;
+    }
+    .btn:hover{background: rgba(255,255,255,.06)}
+    .btn.primary{
+      border-color: rgba(100,181,255,.28);
+      background: linear-gradient(180deg, rgba(100,181,255,.22), rgba(255,255,255,.03));
+    }
+    .btn.safe{
+      border-color: rgba(51,231,173,.26);
+      background: linear-gradient(180deg, rgba(51,231,173,.18), rgba(255,255,255,.03));
+    }
+    .btn.ghost{
+      background: rgba(255,255,255,.03);
+      border-color: rgba(255,255,255,.08);
+      color: rgba(235,245,255,.82);
+    }
+
+    /* === CLEAN PATTERN: "Decision Strip" (hero) === */
+    .decision{
+      display:grid;
+      grid-template-columns: 1.2fr .9fr;
+      gap:12px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.22);
+    }
+    @media (max-width: 840px){
+      .decision{grid-template-columns: 1fr;}
+    }
+    .decision h3{
+      margin:0;
+      font-size: 16px;
+      letter-spacing: .2px;
+    }
+    .decision .metaLine{
+      margin-top:6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .decisionRight{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:flex-end;
+      justify-content:space-between;
+    }
+    @media (max-width: 840px){
+      .decisionRight{align-items:flex-start;}
+    }
+    .scoreRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    @media (max-width: 840px){
+      .scoreRow{justify-content:flex-start;}
+    }
+    .miniStat{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+      max-width: fit-content;
+      white-space:nowrap;
+    }
+    .dividerV{width:1px;height:30px;background:rgba(255,255,255,.10)}
+
+    /* Collapsible AI note */
+    details.ai{
+      margin-top: 8px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.16);
+      padding: 10px 12px;
+    }
+    details.ai summary{
+      cursor:pointer;
+      list-style:none;
+      user-select:none;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      color: rgba(235,245,255,.84);
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing:.25px;
+      text-transform: uppercase;
+    }
+    details.ai summary::-webkit-details-marker{display:none}
+    details.ai .aiBody{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    /* Coverage score (compact) */
+    .meter{
+      margin-top: 12px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.20);
+      padding: 12px;
+    }
+    .bar{
+      height: 10px;
+      background: rgba(255,255,255,.08);
+      border-radius: 999px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+    }
+    .fill{
+      height:100%;
+      width: 74%;
+      background: linear-gradient(90deg, rgba(51,231,173,.75), rgba(100,181,255,.55));
+      border-radius: 999px;
+    }
+    .meterRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* Compact list blocks */
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top: 12px;
+    }
+    .item{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding: 12px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+    }
+    .item b{font-size: 13px}
+    .item span{font-size: 12px; color: var(--muted)}
+    .rightText{ text-align:right; }
+
+    /* Risk windows (collapsed) */
+    .riskLine{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+    }
+    .riskLine .left{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width: 0;
+    }
+    .riskLine .left b{font-size: 13px}
+    .riskLine .left span{
+      font-size: 12px;
+      color: var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width: 56ch;
+    }
+    .linkish{
+      color: rgba(235,245,255,.78);
+      font-weight: 800;
+      font-size: 12px;
+      opacity: .9;
+      cursor:pointer;
+      user-select:none;
+    }
+    .linkish:hover{opacity:1;text-decoration:underline}
+
+    /* Right column: alerts + 2 cards only */
+    .panel{
+      padding: 12px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+    }
+    .panelTitle{
+      font-weight: 900;
+      letter-spacing:.25px;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: rgba(235,245,255,.70);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .panelBody{margin-top: 10px;}
+    .kpiRow{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .kpiRow .big{
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -.3px;
+      line-height: 1;
+    }
+
+    .alerts{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top: 12px;
+    }
+    .alert{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      padding: 12px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+    }
+    .alert .aLeft{display:flex;flex-direction:column;gap:4px}
+    .alert .aLeft b{font-size: 13px}
+    .alert .aLeft span{font-size: 12px; color: var(--muted)}
+
+    /* Schedule editor */
+    .scheduleWrap{
+      display:grid;
+      grid-template-columns: 300px 1fr;
+      gap:12px;
+    }
+    @media (max-width: 980px){ .scheduleWrap{grid-template-columns: 1fr;} }
+
+    .sidePanel{
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+      padding: 12px;
+    }
+    .shiftPool{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top: 10px;
+    }
+    .shift{
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      cursor: grab;
+      user-select:none;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .shift:active{cursor: grabbing}
+    .shift .meta{display:flex; flex-direction:column; gap:4px;}
+    .shift .meta b{font-size: 13px}
+    .shift .meta span{font-size: 12px; color: var(--muted)}
+    .shift .pillMini{
+      font-size: 11px;
+      font-weight: 800;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.10);
+      color: var(--muted);
+      background: rgba(0,0,0,.16);
+      white-space:nowrap;
+    }
+
+    .gridPanel{
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+      overflow:hidden;
+    }
+    .gridHead{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      padding: 12px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .gridHead .title{font-weight:900; letter-spacing:.2px;}
+    .gridScroll{overflow:auto;}
+    .scheduleGrid{
+      display:grid;
+      grid-template-columns: 110px repeat(7, 1fr);
+      min-width: 900px;
+    }
+    .cell{
+      border-right: 1px solid rgba(255,255,255,.06);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      padding: 10px;
+      min-height: 66px;
+      position:relative;
+    }
+    .cell.header{
+      min-height: 44px;
+      background: rgba(255,255,255,.02);
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 800;
+      letter-spacing:.3px;
+      text-transform: uppercase;
+    }
+    .cell.role{
+      background: rgba(0,0,0,.12);
+      font-weight: 900;
+      color: rgba(235,245,255,.78);
+      font-size: 12px;
+      letter-spacing:.35px;
+      text-transform: uppercase;
+    }
+    .dropzone{
+      border-radius: 12px;
+      height: 100%;
+      min-height: 46px;
+      border: 1px dashed rgba(255,255,255,.14);
+      background: rgba(255,255,255,.02);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: rgba(235,245,255,.35);
+      font-size: 12px;
+      text-align:center;
+      padding: 8px;
+    }
+    .dropzone.over{
+      border-color: rgba(51,231,173,.34);
+      background: rgba(51,231,173,.06);
+      color: rgba(235,245,255,.68);
+    }
+    .assigned{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(51,231,173,.20);
+      background: rgba(51,231,173,.08);
+      margin: 6px 0;
+      color: rgba(235,245,255,.92);
+    }
+    .assigned b{font-size: 12px}
+    .assigned span{font-size: 11px; color: rgba(235,245,255,.68)}
+    .assigned button{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      color: rgba(235,245,255,.80);
+      border-radius: 10px;
+      padding: 6px 8px;
+      cursor:pointer;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .assigned button:hover{background: rgba(0,0,0,.26)}
+
+    /* Labor vs sales */
+    .split{
+      display:grid;
+      grid-template-columns: 1fr .9fr;
+      gap:12px;
+    }
+    @media (max-width: 980px){ .split{grid-template-columns: 1fr;} }
+
+    .kvCompact{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top: 12px;
+    }
+    @media (max-width: 620px){ .kvCompact{grid-template-columns: 1fr;} }
+    .kvBox{
+      padding: 12px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.22);
+    }
+    .kvBox .label{
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing:.35px;
+      font-weight: 800;
+    }
+    .kvBox .value{
+      margin-top: 8px;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -.3px;
+    }
+
+    /* Employee detail */
+    .profile{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .avatar{
+      width:46px; height:46px;
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: radial-gradient(18px 18px at 30% 30%, rgba(255,255,255,.10), rgba(0,0,0,.18));
+      display:grid; place-items:center;
+      font-weight: 900;
+      color: rgba(235,245,255,.85);
+      user-select:none;
+    }
+
+    .hidden{display:none !important;}
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="leftCluster">
+        <div class="hamb" title="Menu">☰</div>
+        <div class="pill">
+          <div class="loc">
+            <span class="iconDot"></span>
+            <span>Location</span>
+            <span class="caret">▼</span>
+          </div>
+          <span class="tag">Fri, Feb 6 • 45° Cloudy</span>
+        </div>
+      </div>
+
+      <div class="rightCluster">
+        <div class="tabs" role="tablist" aria-label="Staffing Views">
+          <button class="tab active" data-view="overview" role="tab" aria-selected="true">Overview</button>
+          <button class="tab" data-view="schedule" role="tab" aria-selected="false">Schedule</button>
+          <button class="tab" data-view="labor" role="tab" aria-selected="false">Labor vs Sales</button>
+          <button class="tab" data-view="employee" role="tab" aria-selected="false">Employee</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <section id="view-overview" class="view">
+      <div class="grid cols2">
+        <!-- LEFT: Decision + details -->
+        <div class="card">
+          <div class="cardHeader">
+            <div>
+              <div class="hTitle">Staffing Overview</div>
+              <div class="hSub">One job: tell you if you’re covered, where you’re bleeding, and the fastest fix.</div>
+            </div>
+            <div class="badge b-warn">⚠ Understaffed</div>
+          </div>
+
+          <div class="cardBody">
+            <!-- Decision strip -->
+            <div class="decision">
+              <div>
+                <div class="row" style="align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                  <h3 style="margin:0;">Dinner gap risk (6:00-8:00)</h3>
+                  <span class="badge b-bad">HIGH</span>
+                  <span class="badge b-info">Weather lift likely</span>
+                </div>
+
+                <div class="metaLine">Coverage is thin at peak. Fix open shifts first, then add targeted labor if needed.</div>
+
+                <details class="ai">
+                  <summary>
+                    <span>Why this is happening</span>
+                    <span class="tiny">AI note ▾</span>
+                  </summary>
+                  <div class="aiBody">
+                    Forecast demand is up (+8.2%). Current coverage leaves dinner under-served, increasing ticket time and overtime risk.
+                    Suggested sequence: <b>fill open shifts</b>  to  <b>patch dinner</b>  to  validate labor % drift.
+                  </div>
+                </details>
+
+                <div class="actions">
+                  <button class="btn safe" data-jump="schedule"> to  Fix Open Shifts</button>
+                  <button class="btn primary" data-jump="schedule"> to  Adjust Schedule</button>
+                  <button class="btn ghost">View staffing plan</button>
+                </div>
+              </div>
+
+              <div class="decisionRight">
+                <div class="scoreRow">
+                  <span class="badge b-info">Coverage 74 / 100</span>
+                  <span class="badge b-warn">Target 82+</span>
+                </div>
+
+                <div class="miniStat">
+                  <div class="col">
+                    <span class="tiny">Scheduled</span>
+                    <span class="kpiSmall">16</span>
+                  </div>
+                  <div class="dividerV"></div>
+                  <div class="col">
+                    <span class="tiny">Recommended</span>
+                    <span class="kpiSmall">18</span>
+                  </div>
+                </div>
+
+                <div class="tiny" style="text-align:right;">Variance: -8</div>
+              </div>
+            </div>
+
+            <!-- Coverage score (kept, but compact + not a second “hero”) -->
+            <div class="meter">
+              <div class="row">
+                <div class="col">
+                  <div class="hTitle" style="margin:0; font-size:12px">Coverage Score</div>
+                  <div class="tiny">Composite of labor plan, forecast demand, and risk windows</div>
+                </div>
+                <div class="badge b-info">74 / 100</div>
+              </div>
+              <div style="height:10px"></div>
+              <div class="bar"><div class="fill"></div></div>
+              <div class="meterRow">
+                <span>Target: 82+</span>
+                <span>Variance: -8</span>
+              </div>
+            </div>
+
+            <!-- Peak windows: compact lines + expandable detail -->
+            <div style="height:12px"></div>
+            <div class="row">
+              <div class="hTitle">Peak Risk Windows</div>
+              <span class="linkish" id="toggle-windows">View details</span>
+            </div>
+
+            <div class="list" style="margin-top:10px;">
+              <div class="riskLine">
+                <div class="left">
+                  <b>Lunch • 11:30-1:00 <span class="tiny">(FOH thin)</span></b>
+                  <span>Wait time pressure; keep floor steady.</span>
+                </div>
+                <div class="badge b-warn">MED</div>
+              </div>
+
+              <div class="riskLine">
+                <div class="left">
+                  <b>Dinner • 6:00-8:00 <span class="tiny">(Line + expo)</span></b>
+                  <span>Bottleneck risk; overtime likely without patch.</span>
+                </div>
+                <div class="badge b-bad">HIGH</div>
+              </div>
+            </div>
+
+            <details class="ai" id="windows-detail" style="margin-top:10px;">
+              <summary><span>Peak window detail</span><span class="tiny">expand ▾</span></summary>
+              <div class="aiBody">
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                  <div class="panel">
+                    <div class="panelTitle">Lunch Rush (11:30-1:00) <span class="badge b-warn">MED</span></div>
+                    <div class="panelBody tiny">FOH coverage is thin; watch table backlog and host pacing.</div>
+                  </div>
+                  <div class="panel">
+                    <div class="panelTitle">Dinner Rush (6:00-8:00) <span class="badge b-bad">HIGH</span></div>
+                    <div class="panelBody tiny">Line + expo bottleneck; fill expo/line before adding floor.</div>
+                  </div>
+                </div>
+              </div>
+            </details>
+
+            <!-- Recommendations: top 2 + optional group -->
+            <div style="height:12px"></div>
+            <div class="hTitle">Recommended moves (high confidence)</div>
+            <div class="list">
+              <div class="item">
+                <div>
+                  <b>Add 1 Line Cook</b>
+                  <span>6:00-9:00 • reduces ticket time and comp risk</span>
+                </div>
+                <div class="rightText">
+                  <div class="badge b-good">+$420 est</div>
+                  <div class="tiny">ROI positive</div>
+                </div>
+              </div>
+              <div class="item">
+                <div>
+                  <b>Add 1 Server</b>
+                  <span>11:00-2:00 • prevents table backlog</span>
+                </div>
+                <div class="rightText">
+                  <div class="badge b-good">+$180 est</div>
+                  <div class="tiny">ROI positive</div>
+                </div>
+              </div>
+            </div>
+
+            <details class="ai" style="margin-top:10px;">
+              <summary><span>Optional changes</span><span class="tiny">1 item ▾</span></summary>
+              <div class="aiBody">
+                <div class="item">
+                  <div>
+                    <b>Optional cut: 1 Host</b>
+                    <span>3:00-4:30 • low demand window</span>
+                  </div>
+                  <div class="rightText">
+                    <div class="badge b-warn">-$65 saved</div>
+                    <div class="tiny">watch experience</div>
+                  </div>
+                </div>
+              </div>
+            </details>
+
+            <div class="actions">
+              <button class="btn safe" data-jump="schedule"> to  Apply via schedule</button>
+              <button class="btn ghost">View all recommendations</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: only what changes decisions -->
+        <div class="card">
+          <div class="cardHeader">
+            <div>
+              <div class="hTitle">Today Signals</div>
+              <div class="hSub">Only the numbers and alerts that change what you do next.</div>
+            </div>
+            <div class="badge b-good">✓ Stable</div>
+          </div>
+
+          <div class="cardBody">
+            <div class="panel">
+              <div class="panelTitle">
+                <span>Labor % Today</span>
+                <span class="badge b-warn">Above target</span>
+              </div>
+              <div class="panelBody">
+                <div class="kpiRow">
+                  <div class="big">28.4%</div>
+                  <div class="tiny" style="text-align:right;">Target 26.0% (+2.4)</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="height:10px"></div>
+
+            <div class="panel">
+              <div class="panelTitle">
+                <span>Operational Risk</span>
+                <span class="badge b-bad">High</span>
+              </div>
+              <div class="panelBody">
+                <div class="row">
+                  <div class="col">
+                    <div style="font-weight:900;">Open shifts</div>
+                    <div class="tiny">3 total (2 BOH, 1 FOH)</div>
+                  </div>
+                  <div class="badge b-warn">3</div>
+                </div>
+                <div style="height:10px"></div>
+                <div class="row">
+                  <div class="col">
+                    <div style="font-weight:900;">OT watch</div>
+                    <div class="tiny">2 employees projected &gt; 40h</div>
+                  </div>
+                  <div class="badge b-bad">2</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="alerts">
+              <div class="alert">
+                <div class="aLeft">
+                  <b>⚠ Dinner coverage gap</b>
+                  <span>Patch expo/line first (6-8 PM)</span>
+                </div>
+                <div class="badge b-bad">HIGH</div>
+              </div>
+              <div class="alert">
+                <div class="aLeft">
+                  <b>⛔ OT threshold risk</b>
+                  <span>Consider swap/cut outside peak</span>
+                </div>
+                <div class="badge b-warn">MED</div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn safe" data-jump="schedule"> to  Fix Open Shifts</button>
+              <button class="btn ghost" data-jump="labor">See labor drivers</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCHEDULE -->
+    <section id="view-schedule" class="view hidden">
+      <div class="grid cols1">
+        <div class="card">
+          <div class="cardHeader">
+            <div>
+              <div class="hTitle">Schedule Editor</div>
+              <div class="hSub">This is the money view: patch risk windows fast, keep labor honest, stay compliant.</div>
+            </div>
+            <div class="badge b-info">Prototype</div>
+          </div>
+
+          <div class="cardBody">
+            <!-- Decision strip (same pattern as overview) -->
+            <div class="decision">
+              <div>
+                <div class="row" style="align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                  <h3 style="margin:0;">Fill 3 open shifts  to  reduces dinner risk</h3>
+                  <span class="badge b-bad">Dinner gap</span>
+                </div>
+                <div class="metaLine">Drag open shifts into matching role rows. Use swaps for coverage without adding labor.</div>
+
+                <details class="ai">
+                  <summary><span>Scheduling logic</span><span class="tiny">expand ▾</span></summary>
+                  <div class="aiBody">
+                    Priority order: (1) fill BOH bottlenecks (Line/Expo), (2) confirm FOH pace, (3) validate labor drift.
+                    In the real build: conflicts, breaks, compliance, skill requirements, and approvals.
+                  </div>
+                </details>
+
+                <div class="actions">
+                  <button class="btn safe">Publish Schedule</button>
+                  <button class="btn primary">Export</button>
+                  <button class="btn ghost" data-jump="overview">Back to overview</button>
+                </div>
+              </div>
+
+              <div class="decisionRight">
+                <div class="scoreRow">
+                  <span class="badge b-warn">3 open</span>
+                  <span class="badge b-bad">Dinner gap</span>
+                </div>
+                <div class="miniStat">
+                  <div class="col">
+                    <span class="tiny">OT Watch</span>
+                    <span class="kpiSmall">2</span>
+                  </div>
+                  <div class="dividerV"></div>
+                  <div class="col">
+                    <span class="tiny">Coverage</span>
+                    <span class="kpiSmall">74</span>
+                  </div>
+                </div>
+                <div class="tiny" style="text-align:right;">Tip: patch BOH first.</div>
+              </div>
+            </div>
+
+            <div style="height:12px"></div>
+
+            <div class="scheduleWrap">
+              <!-- Left side: open shifts + swaps -->
+              <div class="sidePanel">
+                <div class="row">
+                  <div class="col">
+                    <div class="hTitle" style="margin:0">Open Shifts</div>
+                    <div class="tiny">Drag into a matching role/day cell</div>
+                  </div>
+                  <div class="badge b-warn">3 Open</div>
+                </div>
+
+                <div class="shiftPool" id="shiftPool">
+                  <div class="shift" draggable="true" data-shift-id="s1" data-role="Line" data-time="6:00-9:00 PM" data-name="(Open)">
+                    <div class="meta">
+                      <b>Line Cook</b>
+                      <span>6:00-9:00 PM</span>
+                    </div>
+                    <div class="pillMini">BOH</div>
+                  </div>
+
+                  <div class="shift" draggable="true" data-shift-id="s2" data-role="Server" data-time="11:00 AM-2:00 PM" data-name="(Open)">
+                    <div class="meta">
+                      <b>Server</b>
+                      <span>11:00 AM-2:00 PM</span>
+                    </div>
+                    <div class="pillMini">FOH</div>
+                  </div>
+
+                  <div class="shift" draggable="true" data-shift-id="s3" data-role="Expo" data-time="6:00-8:00 PM" data-name="(Open)">
+                    <div class="meta">
+                      <b>Expo</b>
+                      <span>6:00-8:00 PM</span>
+                    </div>
+                    <div class="pillMini">BOH</div>
+                  </div>
+                </div>
+
+                <div style="height:12px"></div>
+
+                <div class="row">
+                  <div class="hTitle" style="margin:0">Swaps</div>
+                  <span class="tiny">prototype</span>
+                </div>
+                <div class="tiny" style="margin-top:6px;">Swaps are requests + approvals + audit trail in the real build.</div>
+
+                <div class="list">
+                  <div class="item">
+                    <div>
+                      <b>Jordan ↔ Sam</b>
+                      <span>Sat • Server shift</span>
+                    </div>
+                    <div class="rightText">
+                      <div class="badge b-info">Pending</div>
+                      <div class="tiny">needs manager</div>
+                    </div>
+                  </div>
+                </div>
+
+                <details class="ai" style="margin-top:10px;">
+                  <summary><span>Quick checks</span><span class="tiny">expand ▾</span></summary>
+                  <div class="aiBody">
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                      <div class="tiny">• Avoid cutting during 6-8 PM.</div>
+                      <div class="tiny">• Keep OT watch employees below 40h if possible.</div>
+                      <div class="tiny">• Expo coverage often fixes “mystery slowness.”</div>
+                    </div>
+                  </div>
+                </details>
+              </div>
+
+              <!-- Right side: grid -->
+              <div class="gridPanel">
+                <div class="gridHead">
+                  <div>
+                    <span class="title">Week View</span>
+                    <span class="tiny">Drag shifts into matching role cells.</span>
+                  </div>
+                  <div class="badge b-bad">Dinner gap</div>
+                </div>
+
+                <div class="gridScroll">
+                  <div class="scheduleGrid" id="scheduleGrid">
+                    <!-- header row -->
+                    <div class="cell header"></div>
+                    <div class="cell header">Sun</div>
+                    <div class="cell header">Mon</div>
+                    <div class="cell header">Tue</div>
+                    <div class="cell header">Wed</div>
+                    <div class="cell header">Thu</div>
+                    <div class="cell header">Fri</div>
+                    <div class="cell header">Sat</div>
+
+                    <!-- Line Cook row -->
+                    <div class="cell role">Line</div>
+                    <div class="cell"><div class="dropzone" data-role="Line" data-day="Sun">Drop Line shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Line" data-day="Mon">Drop Line shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Line" data-day="Tue">Drop Line shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Line" data-day="Wed">Drop Line shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Line" data-day="Thu">Drop Line shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Line" data-day="Fri">Drop Line shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Line" data-day="Sat">Drop Line shift</div></div>
+
+                    <!-- Server row -->
+                    <div class="cell role">Server</div>
+                    <div class="cell"><div class="dropzone" data-role="Server" data-day="Sun">Drop Server shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Server" data-day="Mon">Drop Server shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Server" data-day="Tue">Drop Server shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Server" data-day="Wed">Drop Server shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Server" data-day="Thu">Drop Server shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Server" data-day="Fri">Drop Server shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Server" data-day="Sat">Drop Server shift</div></div>
+
+                    <!-- Expo row -->
+                    <div class="cell role">Expo</div>
+                    <div class="cell"><div class="dropzone" data-role="Expo" data-day="Sun">Drop Expo shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Expo" data-day="Mon">Drop Expo shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Expo" data-day="Tue">Drop Expo shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Expo" data-day="Wed">Drop Expo shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Expo" data-day="Thu">Drop Expo shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Expo" data-day="Fri">Drop Expo shift</div></div>
+                    <div class="cell"><div class="dropzone" data-role="Expo" data-day="Sat">Drop Expo shift</div></div>
+                  </div>
+                </div>
+
+                <div style="padding:12px">
+                  <div class="tiny">
+                    Mock behavior: dropped shifts become assigned blocks in that cell. Real build adds employee pickers, conflict checks, breaks, compliance, and skill requirements.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn safe">Publish Schedule</button>
+              <button class="btn ghost">Undo changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LABOR VS SALES -->
+    <section id="view-labor" class="view hidden">
+      <div class="grid cols1">
+        <div class="card">
+          <div class="cardHeader">
+            <div>
+              <div class="hTitle">Labor vs Sales</div>
+              <div class="hSub">Drift alerts that tell you what to do, not a spreadsheet cosplay.</div>
+            </div>
+            <div class="badge b-warn">▲ Drift</div>
+          </div>
+
+          <div class="cardBody">
+            <!-- Same decision strip pattern -->
+            <div class="decision">
+              <div>
+                <div class="row" style="align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                  <h3 style="margin:0;">Labor % likely ends above target</h3>
+                  <span class="badge b-warn">+2.4%</span>
+                </div>
+                <div class="metaLine">Best fix: avoid cuts during peak. Use an early cut in the low-demand window if you need to land the target.</div>
+
+                <details class="ai">
+                  <summary><span>Why it’s drifting</span><span class="tiny">AI note ▾</span></summary>
+                  <div class="aiBody">
+                    If sales hold at forecast and staffing stays unchanged, labor % ends the day at <b>28-29%</b> (target <b>26%</b>).
+                    Low-demand window is the safest place to adjust.
+                  </div>
+                </details>
+
+                <div class="actions">
+                  <button class="btn safe" data-jump="schedule"> to  Adjust Schedule</button>
+                  <button class="btn ghost">View chart</button>
+                </div>
+              </div>
+
+              <div class="decisionRight">
+                <div class="scoreRow">
+                  <span class="badge b-info">Current 28.4%</span>
+                  <span class="badge b-warn">Target 26.0%</span>
+                </div>
+                <div class="miniStat">
+                  <div class="col">
+                    <span class="tiny">Forecast</span>
+                    <span class="kpiSmall">$12.8K</span>
+                  </div>
+                  <div class="dividerV"></div>
+                  <div class="col">
+                    <span class="tiny">Over $</span>
+                    <span class="kpiSmall">$315</span>
+                  </div>
+                </div>
+                <div class="tiny" style="text-align:right;">Action likely needed.</div>
+              </div>
+            </div>
+
+            <!-- Keep metrics, but fewer + clearer -->
+            <div class="kvCompact">
+              <div class="kvBox">
+                <div class="label">Projected labor $</div>
+                <div class="value">$3,635</div>
+                <div class="tiny">Over target by ~$315</div>
+              </div>
+              <div class="kvBox">
+                <div class="label">Sales sensitivity</div>
+                <div class="value">+6.5%</div>
+                <div class="tiny">Weather lift on forecast</div>
+              </div>
+            </div>
+
+            <div style="height:12px"></div>
+            <div class="split">
+              <!-- Left: drift alerts (actionable) -->
+              <div class="panel">
+                <div class="panelTitle">
+                  <span>Drift alerts</span>
+                  <span class="tiny">what to do</span>
+                </div>
+
+                <div class="list">
+                  <div class="item">
+                    <div>
+                      <b>3:00-4:30 PM</b>
+                      <span>Low demand window ,  consider early cut (Host / Runner)</span>
+                    </div>
+                    <div class="rightText">
+                      <div class="badge b-warn">MED</div>
+                      <div class="tiny">save ~$65</div>
+                    </div>
+                  </div>
+
+                  <div class="item">
+                    <div>
+                      <b>6:00-8:00 PM</b>
+                      <span>High demand ,  cutting here increases comp/void risk</span>
+                    </div>
+                    <div class="rightText">
+                      <div class="badge b-bad">HIGH</div>
+                      <div class="tiny">don’t cut</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="actions">
+                  <button class="btn safe" data-jump="schedule"> to  Apply change</button>
+                  <button class="btn ghost">Snooze alert</button>
+                </div>
+              </div>
+
+              <!-- Right: rules (collapsed by default) -->
+              <div class="panel">
+                <div class="panelTitle">
+                  <span>Targets & rules</span>
+                  <span class="badge b-good">✓ Enabled</span>
+                </div>
+
+                <details class="ai" style="margin-top:10px;">
+                  <summary><span>Thresholds</span><span class="tiny">expand ▾</span></summary>
+                  <div class="aiBody">
+                    <div class="list" style="margin-top:10px;">
+                      <div class="item">
+                        <div>
+                          <b>Labor % threshold</b>
+                          <span>Warn at 27% • Critical at 29%</span>
+                        </div>
+                        <div class="rightText">
+                          <div class="badge b-info">Active</div>
+                          <div class="tiny">today</div>
+                        </div>
+                      </div>
+
+                      <div class="item">
+                        <div>
+                          <b>Overtime risk</b>
+                          <span>Alert when projected &gt; 40 hours</span>
+                        </div>
+                        <div class="rightText">
+                          <div class="badge b-warn">2 flagged</div>
+                          <div class="tiny">this week</div>
+                        </div>
+                      </div>
+
+                      <div class="item">
+                        <div>
+                          <b>Coverage score</b>
+                          <span>Warn at &lt; 80 • Critical at &lt; 70</span>
+                        </div>
+                        <div class="rightText">
+                          <div class="badge b-warn">74</div>
+                          <div class="tiny">today</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="actions">
+                      <button class="btn primary">Edit thresholds</button>
+                      <button class="btn ghost">Snooze rules</button>
+                    </div>
+                  </div>
+                </details>
+
+                <div class="tiny" style="margin-top:10px;">
+                  Design intent: rules should stay quiet until they must be loud.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EMPLOYEE DETAIL -->
+    <section id="view-employee" class="view hidden">
+      <div class="grid cols2">
+        <div class="card">
+          <div class="cardHeader">
+            <div>
+              <div class="hTitle">Employee Detail</div>
+              <div class="hSub">Everything you need in one screen: availability, hours, notes, and certifications.</div>
+            </div>
+            <div class="badge b-info">Prototype</div>
+          </div>
+
+          <div class="cardBody">
+            <div class="profile">
+              <div class="avatar">JS</div>
+              <div class="col" style="flex:1;">
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                  <div style="font-weight: 900; font-size: 18px; letter-spacing:.2px;">Jordan S.</div>
+                  <div class="badge b-good">Available Today</div>
+                </div>
+                <div class="tiny">Role: Server • Tenure: 1y 4m • Reliability: High</div>
+              </div>
+            </div>
+
+            <!-- Same decision strip pattern, but small -->
+            <div style="height:12px"></div>
+            <div class="decision">
+              <div>
+                <div class="row" style="align-items:flex-start; gap:10px; flex-wrap:wrap;">
+                  <h3 style="margin:0;">Safe add for lunch coverage</h3>
+                  <span class="badge b-info">11:00-2:00</span>
+                </div>
+                <div class="metaLine">Jordan is under OT threshold and strong under pressure. Good candidate to plug an open Server shift.</div>
+                <div class="actions">
+                  <button class="btn safe" data-jump="schedule">＋ Add to shift</button>
+                  <button class="btn ghost">Message employee</button>
+                </div>
+              </div>
+
+              <div class="decisionRight">
+                <div class="scoreRow">
+                  <span class="badge b-info">Hours 36.5</span>
+                  <span class="badge b-warn">OT at 40</span>
+                </div>
+                <div class="tiny" style="text-align:right;">No conflicts flagged.</div>
+              </div>
+            </div>
+
+            <!-- Fewer tiles, more signal -->
+            <div class="kvCompact">
+              <div class="kvBox">
+                <div class="label">Hours this week</div>
+                <div class="value">36.5</div>
+                <div class="tiny">OT risk at 40</div>
+              </div>
+              <div class="kvBox">
+                <div class="label">Performance</div>
+                <div class="value">Strong</div>
+                <div class="tiny">Upsell + guest sentiment up</div>
+              </div>
+            </div>
+
+            <details class="ai" style="margin-top:10px;">
+              <summary><span>Notes & coaching</span><span class="tiny">expand ▾</span></summary>
+              <div class="aiBody">
+                <div class="item" style="margin-top:10px;">
+                  <div>
+                    <b>Manager note</b>
+                    <span>Great under pressure. Consider training for shift lead.</span>
+                  </div>
+                  <div class="rightText">
+                    <div class="tiny">Last updated</div>
+                    <b style="font-size:12px; opacity:.9;">Feb 1</b>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button class="btn primary">Add note</button>
+                  <button class="btn ghost">Edit availability</button>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardHeader">
+            <div>
+              <div class="hTitle">Upcoming & Certifications</div>
+              <div class="hSub">Quick view. Real build becomes calendar + rules engine.</div>
+            </div>
+            <div class="badge b-warn">OT Watch</div>
+          </div>
+
+          <div class="cardBody">
+            <div class="panel">
+              <div class="panelTitle">
+                <span>Upcoming shifts</span>
+                <span class="tiny">next 3</span>
+              </div>
+              <div class="panelBody">
+                <div class="list" style="margin-top:0;">
+                  <div class="item">
+                    <div>
+                      <b>Fri • 5:00-10:00</b>
+                      <span>Server • Dinner</span>
+                    </div>
+                    <div class="rightText">
+                      <div class="badge b-good">Confirmed</div>
+                      <div class="tiny">peak</div>
+                    </div>
+                  </div>
+                  <div class="item">
+                    <div>
+                      <b>Sat • 11:00-4:00</b>
+                      <span>Server • Lunch</span>
+                    </div>
+                    <div class="rightText">
+                      <div class="badge b-info">Scheduled</div>
+                      <div class="tiny">steady</div>
+                    </div>
+                  </div>
+                  <div class="item">
+                    <div>
+                      <b>Sun • Off</b>
+                      <span>Unavailable</span>
+                    </div>
+                    <div class="rightText">
+                      <div class="badge b-warn">Rest</div>
+                      <div class="tiny">good</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="height:10px"></div>
+
+            <details class="ai">
+              <summary><span>Certifications</span><span class="tiny">2 active ▾</span></summary>
+              <div class="aiBody">
+                <div class="list" style="margin-top:10px;">
+                  <div class="item">
+                    <div>
+                      <b>TIPS</b>
+                      <span>Valid • Alcohol service</span>
+                    </div>
+                    <div class="rightText">
+                      <div class="badge b-good">Active</div>
+                      <div class="tiny">expires 2026</div>
+                    </div>
+                  </div>
+                  <div class="item">
+                    <div>
+                      <b>Food Handler</b>
+                      <span>Valid • Compliance</span>
+                    </div>
+                    <div class="rightText">
+                      <div class="badge b-good">Active</div>
+                      <div class="tiny">expires 2026</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button class="btn primary">Add certification</button>
+                  <button class="btn ghost">Request CPR</button>
+                </div>
+              </div>
+            </details>
+
+            <div class="actions">
+              <button class="btn primary">Request swap</button>
+              <button class="btn ghost">Flag issue</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // --- Tabs / Views ---
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const views = {
+      overview: document.getElementById("view-overview"),
+      schedule: document.getElementById("view-schedule"),
+      labor: document.getElementById("view-labor"),
+      employee: document.getElementById("view-employee"),
+    };
+
+    function showView(key){
+      Object.values(views).forEach(v => v.classList.add("hidden"));
+      views[key].classList.remove("hidden");
+      tabs.forEach(t => {
+        const isActive = t.dataset.view === key;
+        t.classList.toggle("active", isActive);
+        t.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    tabs.forEach(t => t.addEventListener("click", () => showView(t.dataset.view)));
+
+    // Jump buttons
+    document.querySelectorAll("[data-jump]").forEach(btn => {
+      btn.addEventListener("click", () => showView(btn.dataset.jump));
+    });
+
+    // Peak window detail toggle (just a convenience)
+    const toggleWindows = document.getElementById("toggle-windows");
+    const windowsDetail = document.getElementById("windows-detail");
+    if (toggleWindows && windowsDetail) {
+      toggleWindows.addEventListener("click", () => {
+        windowsDetail.open = !windowsDetail.open;
+        windowsDetail.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      });
+    }
+
+    // --- Schedule drag & drop (prototype) ---
+    let draggedShiftEl = null;
+
+    function bindShiftDrag(shift){
+      shift.addEventListener("dragstart", (e) => {
+        draggedShiftEl = shift;
+        e.dataTransfer.setData("text/plain", JSON.stringify({
+          id: shift.dataset.shiftId,
+          role: shift.dataset.role,
+          time: shift.dataset.time,
+          name: shift.dataset.name
+        }));
+        e.dataTransfer.effectAllowed = "move";
+      });
+      shift.addEventListener("dragend", () => draggedShiftEl = null);
+    }
+
+    document.querySelectorAll(".shift[draggable='true']").forEach(bindShiftDrag);
+
+    function makeAssignedBlock({ role, time, day, id }) {
+      const wrap = document.createElement("div");
+      wrap.className = "assigned";
+      wrap.dataset.assignedId = `${id}-${day}-${role}-${Date.now()}`;
+      wrap.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <b>${role} • <span style="opacity:.85">${day}</span></b>
+          <span>${time}</span>
+        </div>
+        <button title="Unassign" aria-label="Unassign">×</button>
+      `;
+      wrap.querySelector("button").addEventListener("click", () => {
+        // Put it back into the pool as a draggable shift
+        const pool = document.getElementById("shiftPool");
+        const newShift = document.createElement("div");
+        newShift.className = "shift";
+        newShift.setAttribute("draggable", "true");
+        newShift.dataset.shiftId = id + "-r";
+        newShift.dataset.role = role;
+        newShift.dataset.time = time;
+        newShift.dataset.name = "(Open)";
+        newShift.innerHTML = `
+          <div class="meta">
+            <b>${role === "Line" ? "Line Cook" : role}</b>
+            <span>${time}</span>
+          </div>
+          <div class="pillMini">${role === "Server" ? "FOH" : "BOH"}</div>
+        `;
+        pool.prepend(newShift);
+        bindShiftDrag(newShift);
+        wrap.remove();
+      });
+      return wrap;
+    }
+
+    document.querySelectorAll(".dropzone").forEach(zone => {
+      zone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        zone.classList.add("over");
+        e.dataTransfer.dropEffect = "move";
+      });
+      zone.addEventListener("dragleave", () => zone.classList.remove("over"));
+      zone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        zone.classList.remove("over");
+
+        const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+        const role = zone.dataset.role;
+        const day = zone.dataset.day;
+
+        // Simple constraint: only allow shifts into matching role row
+        if (data.role !== role) {
+          zone.textContent = "Wrong role (match the row)";
+          setTimeout(() => zone.textContent = `Drop ${role} shift`, 900);
+          return;
+        }
+
+        // Clear placeholder text if still present
+        zone.textContent = "";
+        const block = makeAssignedBlock({ role, time: data.time, day, id: data.id });
+        zone.appendChild(block);
+
+        // Remove from pool when assigned
+        if (draggedShiftEl && draggedShiftEl.closest("#shiftPool")) {
+          draggedShiftEl.remove();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

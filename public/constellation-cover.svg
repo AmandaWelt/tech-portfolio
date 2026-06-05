@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Constellation Payments  CSI Pay Admin Portal">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f1419"/>
+      <stop offset="100%" stop-color="#1a2332"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#c9a227"/>
+      <stop offset="100%" stop-color="#e8c547"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <rect x="80" y="80" width="1040" height="515" rx="12" fill="none" stroke="#2d3a4f" stroke-width="1"/>
+  <text x="600" y="280" fill="url(#accent)" font-family="system-ui, sans-serif" font-size="44" font-weight="500" text-anchor="middle">Constellation Payments</text>
+  <text x="600" y="340" fill="#e8eaed" font-family="system-ui, sans-serif" font-size="26" text-anchor="middle">CSI Pay Admin Portal</text>
+  <text x="600" y="400" fill="#8a919e" font-family="ui-monospace, monospace" font-size="14" text-anchor="middle">Onboarding · Payment ops · ACH · Treasury · Reporting</text>
+</svg>

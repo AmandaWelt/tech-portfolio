@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Pop-Up Jam  geo-discoverable jam network">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#161b22"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#c6f04a"/>
+      <stop offset="100%" stop-color="#3fb950"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <circle cx="420" cy="340" r="6" fill="#3fb950" opacity="0.9"/>
+  <circle cx="520" cy="280" r="8" fill="#3fb950" opacity="0.7"/>
+  <circle cx="680" cy="360" r="7" fill="#f0883e" opacity="0.85"/>
+  <circle cx="780" cy="300" r="5" fill="#3fb950" opacity="0.6"/>
+  <path d="M360 420 Q600 200 840 400" fill="none" stroke="rgba(198,240,74,0.15)" stroke-width="2"/>
+  <rect x="80" y="80" width="1040" height="515" rx="12" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+  <text x="600" y="300" fill="url(#accent)" font-family="system-ui, sans-serif" font-size="52" font-weight="500" text-anchor="middle">Pop-Up Jam</text>
+  <text x="600" y="360" fill="rgba(230,237,243,0.62)" font-family="system-ui, sans-serif" font-size="22" text-anchor="middle">Map-first jam discovery for musicians</text>
+  <text x="600" y="420" fill="rgba(230,237,243,0.4)" font-family="ui-monospace, monospace" font-size="14" text-anchor="middle">City pilot · Leaflet · zero-backend prototype</text>
+</svg>

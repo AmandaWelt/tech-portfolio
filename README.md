@@ -1,18 +1,35 @@
-# Getting Started with Create React App
+# Amanda Welt — tech portfolio
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Local development (auto-refresh)
 
-## Available Scripts
+Run **once** and leave the terminal open — you do not need to restart after each edit:
 
-In the project directory, you can run:
+```bash
+npm install --legacy-peer-deps
+npm start
+```
 
-### `yarn start`
+Open [http://localhost:3000](http://localhost:3000). Saves to `.tsx`, `.css`, and `public/` files hot-reload in the browser.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+If changes do not appear on Windows, `.env.development` already enables file polling. Stop with `Ctrl+C` only when you are done for the day.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Live site (auto-deploy)
+
+Every **push to `main`** triggers [GitHub Actions](.github/workflows/deploy.yml) to build and publish to GitHub Pages.
+
+**One-time setup** (repo [AmandaWelt/tech-portfolio](https://github.com/AmandaWelt/tech-portfolio)):
+
+1. **Settings → Pages → Build and deployment → Source:** `GitHub Actions`
+2. Push to `main` — the **Actions** tab shows the deploy workflow
+3. Site URL: **https://amandawelt.github.io/tech-portfolio**
+
+Custom domain (`amandawelt.com`): add it under **Settings → Pages → Custom domain** and follow GitHub’s DNS instructions.
+
+## Scripts
+
+### `npm start`
+
+Development server with hot reload (see above).
 
 ### `yarn test`
 

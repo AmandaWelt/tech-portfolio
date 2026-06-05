@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workforce Dashboard Prototype - Tablet</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root{
+      --bg0:#0B0F14;
+      --bg1:#0F141B;
+
+      --card0: rgba(22, 27, 35, .78);
+      --card1: rgba(22, 27, 35, .62);
+
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.06);
+
+      --text:#EAF0F7;
+      --muted: rgba(234,240,247,.62);
+
+      --green:#34D399;
+      --orange:#F59E0B;
+      --blue:#2563EB;
+
+      --shadow: 0 14px 40px rgba(0,0,0,.55);
+      --shadowSoft: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 22px;
+
+      --glassTop: rgba(255,255,255,.10);
+      --glassBot: rgba(255,255,255,0);
+    }
+
+    .light-theme{
+      --bg0:#F3F4F6;
+      --bg1:#EEF2F7;
+
+      --card0: rgba(255,255,255,.92);
+      --card1: rgba(255,255,255,.82);
+
+      --stroke: rgba(0,0,0,.08);
+      --stroke2: rgba(0,0,0,.06);
+
+      --text:#111827;
+      --muted: rgba(17,24,39,.55);
+
+      --shadow: 0 12px 35px rgba(15,23,42,.12);
+      --shadowSoft: 0 8px 22px rgba(15,23,42,.10);
+
+      --glassTop: rgba(0,0,0,.06);
+      --glassBot: rgba(0,0,0,0);
+    }
+
+    body{
+      background:
+        radial-gradient(1200px 700px at 50% -15%, rgba(56,189,248,.09), transparent 55%),
+        radial-gradient(900px 700px at 70% 10%, rgba(34,197,94,.09), transparent 55%),
+        radial-gradient(900px 700px at 20% 25%, rgba(37,99,235,.07), transparent 55%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      transition: background .35s ease, color .25s ease;
+      min-height: 100vh;
+    }
+
+    .page-vignette{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(1000px 600px at 50% 25%, transparent 40%, rgba(0,0,0,.55) 100%);
+      opacity: .60;
+      mix-blend-mode: multiply;
+    }
+    .light-theme .page-vignette{ opacity: .12; mix-blend-mode: normal; }
+
+    .glass{
+      position: relative;
+      background: linear-gradient(180deg, var(--card0), var(--card1));
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.06);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      overflow: hidden;
+    }
+
+    .glass:before{
+      content:"";
+      position:absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0));
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events:none;
+      opacity: .85;
+    }
+    .light-theme .glass:before{
+      opacity:.45;
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(0,0,0,.04);
+    }
+
+    .glass-bar{
+      background: linear-gradient(180deg, rgba(22,27,35,.72), rgba(22,27,35,.40));
+      border: 1px solid var(--stroke);
+      border-radius: 18px;
+      box-shadow: var(--shadowSoft);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .light-theme .glass-bar{
+      background: rgba(255,255,255,.80);
+      box-shadow: var(--shadowSoft);
+    }
+
+    .hero-bg{
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(700px 260px at 78% 35%, rgba(52,211,153,.30), transparent 60%),
+        radial-gradient(560px 240px at 55% 50%, rgba(56,189,248,.14), transparent 62%),
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0));
+      opacity: .95;
+      pointer-events:none;
+    }
+    .hero-grid{
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(to right, rgba(255,255,255,.06) 1px, transparent 1px) 0 0/34px 34px,
+        linear-gradient(to bottom, rgba(255,255,255,.04) 1px, transparent 1px) 0 0/34px 34px;
+      opacity:.18;
+      pointer-events:none;
+      mask-image: radial-gradient(600px 220px at 65% 30%, #000 40%, transparent 70%);
+    }
+
+    .chip-ok{
+      background: rgba(52,211,153,.16);
+      color: var(--green);
+      border: 1px solid rgba(52,211,153,.28);
+    }
+
+    .btn-ghost{
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--stroke2);
+      color: var(--text);
+    }
+    .light-theme .btn-ghost{
+      background: rgba(17,24,39,.04);
+    }
+
+    .btn-ghost-green{
+      background: rgba(52,211,153,.10);
+      border: 1px solid rgba(52,211,153,.18);
+      color: var(--text);
+    }
+
+    .segmented{
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--stroke2);
+      border-radius: 12px;
+      padding: 4px;
+      display:flex;
+      gap:4px;
+    }
+    .segmented button{
+      flex:1;
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-weight: 900;
+      font-size: 10px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(234,240,247,.55);
+      transition: opacity .15s ease, transform .12s ease;
+    }
+    .segmented button:active{ transform: scale(.99); }
+    .light-theme .segmented button{ color: rgba(17,24,39,.55); }
+
+    .segmented button[data-active="true"]{
+      background: rgba(255,255,255,.10);
+      border: 1px solid var(--stroke);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .nav-pill{
+      background: linear-gradient(180deg, rgba(22,27,35,.80), rgba(22,27,35,.62));
+      border: 1px solid var(--stroke);
+      box-shadow: 0 18px 50px rgba(0,0,0,.60);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 18px;
+    }
+    .light-theme .nav-pill{
+      background: rgba(255,255,255,.86);
+      box-shadow: 0 16px 40px rgba(15,23,42,.18);
+    }
+
+    .active-glow{
+      position: relative;
+      color: var(--green);
+    }
+    .active-glow:after{
+      content:"";
+      position:absolute;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:-10px;
+      width: 44px;
+      height: 18px;
+      background: radial-gradient(circle, rgba(52,211,153,.40), transparent 65%);
+      filter: blur(2px);
+    }
+
+    .icon-circle{
+      width: 38px; height: 38px;
+      border-radius: 999px;
+      display:flex; align-items:center; justify-content:center;
+      background: rgba(52,211,153,.14);
+      border: 1px solid rgba(52,211,153,.25);
+      box-shadow: 0 10px 25px rgba(52,211,153,.18);
+    }
+
+    .muted{ color: var(--muted); }
+
+    /* NEW: tiny input style for manual entry mock */
+    .input{
+      width:100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--stroke2);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 12px;
+      outline: none;
+    }
+    .light-theme .input{
+      background: rgba(17,24,39,.03);
+    }
+    .input::placeholder{ color: rgba(234,240,247,.45); }
+    .light-theme .input::placeholder{ color: rgba(17,24,39,.40); }
+
+    /* NEW: small divider */
+    .divider{ height:1px; width:100%; background: var(--stroke2); }
+
+    /* Light/Dark toggle */
+    .theme-toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--stroke2);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.14em;
+      text-transform:uppercase;
+      transition: transform .12s ease, opacity .2s ease;
+    }
+    .theme-toggle:active{ transform: scale(.98); }
+    .theme-toggle .toggle-label{ opacity:.35; }
+    .theme-toggle .toggle-label:last-child{ opacity:1; }
+    .theme-toggle .toggle-track{
+      width:38px;
+      height:20px;
+      border-radius:999px;
+      border:1px solid var(--stroke2);
+      background: rgba(255,255,255,.08);
+      position:relative;
+    }
+    .theme-toggle .toggle-dot{
+      position:absolute;
+      top:2px;
+      left:2px;
+      width:14px;
+      height:14px;
+      border-radius:999px;
+      background: var(--text);
+      transform: translateX(18px);
+      transition: transform .2s ease;
+    }
+    .light-theme .theme-toggle{
+      background: rgba(17,24,39,.04);
+    }
+    .light-theme .theme-toggle .toggle-label:first-child{ opacity:1; }
+    .light-theme .theme-toggle .toggle-label:last-child{ opacity:.35; }
+    .light-theme .theme-toggle .toggle-dot{ transform: translateX(0); }
+
+    /* Tablet/Desktop layout helpers */
+    @media (min-width: 768px){
+      .tablet-grid{
+        display:grid;
+        grid-template-columns: 1.25fr 0.9fr;
+        gap: 18px;
+      }
+    }
+
+    /* Sidebar layout */
+    .sidebar{
+      background: rgba(15,20,27,.86);
+      border-right: 1px solid var(--stroke);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .light-theme .sidebar{
+      background: rgba(255,255,255,.75);
+    }
+  </style>
+</head>
+
+<body class="flex min-h-screen">
+  <div class="page-vignette"></div>
+
+  <aside class="sidebar w-20 lg:w-64 flex-shrink-0 flex flex-col items-center lg:items-start p-6">
+    <div class="mb-12 px-2">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white shadow-lg"
+           style="background: var(--blue);">G</div>
+    </div>
+
+    <nav class="space-y-8 w-full">
+      <div class="flex items-center gap-4 text-green-400 font-bold px-2 cursor-pointer">
+        <span class="text-2xl">🏠</span>
+        <span class="hidden lg:block text-sm uppercase tracking-widest">Dashboard</span>
+      </div>
+      <div class="flex items-center gap-4 opacity-40 hover:opacity-100 transition px-2 cursor-pointer">
+        <span class="text-2xl">👥</span>
+        <span class="hidden lg:block text-sm uppercase tracking-widest">Staffing</span>
+      </div>
+      <div class="flex items-center gap-4 opacity-40 hover:opacity-100 transition px-2 cursor-pointer">
+        <span class="text-2xl">📈</span>
+        <span class="hidden lg:block text-sm uppercase tracking-widest">Forecast</span>
+      </div>
+      <div class="flex items-center gap-4 opacity-40 hover:opacity-100 transition px-2 cursor-pointer">
+        <span class="text-2xl">⚙️</span>
+        <span class="hidden lg:block text-sm uppercase tracking-widest">Settings</span>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="flex-grow p-6 lg:p-10 overflow-y-auto">
+  <main class="max-w-[1100px] mx-auto space-y-6 pb-28">
+
+    <!-- Header bar with date + weather -->
+    <header class="glass-bar px-4 py-3 flex items-center justify-between">
+      <!-- LEFT: menu -->
+      <button class="opacity-90 active:scale-95 transition">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="18" y2="6"></line>
+          <line x1="3" y1="18" x2="16" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- CENTER: location -->
+      <div class="flex flex-col items-center leading-none">
+        <div class="text-[14px] font-extrabold tracking-tight opacity-95">
+          Location <span class="opacity-60">▾</span>
+        </div>
+      </div>
+
+      <!-- RIGHT: toggle + weather/date + bell -->
+      <div class="flex items-center gap-3">
+        <button
+          onclick="document.body.classList.toggle('light-theme')"
+          class="theme-toggle"
+          title="Toggle light/dark mode"
+        >
+          <span class="toggle-label">☀️</span>
+          <span class="toggle-track"><span class="toggle-dot"></span></span>
+          <span class="toggle-label">🌙</span>
+        </button>
+
+        <div class="text-right leading-tight">
+          <div class="text-[11px] font-black tracking-wide muted">
+            <span id="todayDate">Fri, Jan 21</span>
+          </div>
+          <div class="flex items-center justify-end gap-1">
+            <span id="tempNow" class="text-[13px] font-black">45°</span>
+            <span id="condNow" class="text-[12px] muted">Cloudy</span>
+          </div>
+        </div>
+
+        <div class="relative">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span class="absolute -top-1 -right-1 bg-red-500 text-[9px] font-black text-white rounded-full w-4 h-4 flex items-center justify-center border-2"
+                style="border-color: rgba(22,27,35,.85)">1</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="tablet-grid">
+    <!-- CONSOLIDATED: SALES OVERVIEW (Hero + Sales Trend combined) -->
+    <section class="glass p-6 relative">
+      <div class="hero-bg"></div>
+      <div class="hero-grid"></div>
+
+      <div class="flex justify-between items-start gap-3 relative">
+        <div>
+          <p class="text-[14px] font-extrabold" style="color: var(--green)">
+            You're on track today
+            <span class="inline-flex items-center justify-center px-2 py-[2px] rounded-md text-[10px] font-black ml-1 chip-ok">✓</span>
+          </p>
+
+          <div class="flex items-baseline gap-2 mt-2">
+            <h2 class="text-[40px] leading-none font-black tracking-tight">$12,800</h2>
+            <span class="text-sm font-extrabold" style="color: var(--green)">+ 6.5%</span>
+          </div>
+
+          <p class="text-xs mt-2 font-semibold muted">vs LY $11,750</p>
+        </div>
+
+        <div class="icon-circle mt-1">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="color: var(--green)">
+            <path d="M20 6 9 17l-5-5"></path>
+          </svg>
+        </div>
+      </div>
+
+      <div class="divider my-5"></div>
+
+      <!-- Toggles: 7/30 + TY/LY -->
+      <div class="flex items-center justify-between gap-3">
+        <div class="segmented" id="rangeSeg">
+          <button data-active="true" data-range="7">7 Days</button>
+          <button data-active="false" data-range="30">30 Days</button>
+        </div>
+
+        <div class="segmented" id="yearSeg" style="min-width: 148px;">
+          <button data-active="true" data-year="ty">This Year</button>
+          <button data-active="false" data-year="ly">Last Year</button>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div class="flex items-baseline justify-between">
+          <p class="text-[24px] font-black tracking-tight">
+            <span id="avgVal">$13,250</span>
+            <span class="text-xs font-black ml-2 muted">avg</span>
+            <span class="text-xs font-black ml-1" style="color: var(--green)" id="avgDelta">+ 8.2%</span>
+          </p>
+
+          <button
+            id="toggleLyLine"
+            class="btn-ghost px-3 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase active:scale-[.99] transition opacity-95"
+            title="Show/Hide Last Year comparison line"
+          >
+            Show LY Line
+          </button>
+        </div>
+
+        <!-- Combined chart -->
+        <div class="mt-2 overflow-hidden">
+          <svg viewBox="0 0 400 150" class="w-full h-[180px]">
+            <defs>
+              <linearGradient id="tyFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--green)" stop-opacity="0.26" />
+                <stop offset="100%" stop-color="var(--green)" stop-opacity="0" />
+              </linearGradient>
+              <linearGradient id="lyFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(56,189,248,.40)" stop-opacity="0.18" />
+                <stop offset="100%" stop-color="rgba(56,189,248,0)" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+
+            <!-- grid -->
+            <line x1="14" y1="118" x2="386" y2="118" stroke="rgba(255,255,255,.10)" />
+            <line x1="14" y1="88" x2="386" y2="88" stroke="rgba(255,255,255,.06)" />
+            <line x1="14" y1="58" x2="386" y2="58" stroke="rgba(255,255,255,.06)" />
+
+            <!-- THIS YEAR line/fill -->
+            <path id="tyLine"
+              d="M20,120 C70,118 90,110 120,106 C160,98 170,88 210,84 C250,80 265,72 290,68 C330,60 350,56 380,42"
+              fill="none" stroke="var(--green)" stroke-width="4" stroke-linecap="round" />
+            <path id="tyArea"
+              d="M20,120 C70,118 90,110 120,106 C160,98 170,88 210,84 C250,80 265,72 290,68 C330,60 350,56 380,42
+                 L380,150 L20,150 Z"
+              fill="url(#tyFill)" />
+
+            <!-- LAST YEAR line/fill (toggle) -->
+            <g id="lyGroup" opacity="0.0">
+              <path id="lyLine"
+                d="M20,128 C70,124 90,120 120,116 C160,110 170,104 210,98 C250,94 265,90 290,86 C330,78 350,74 380,66"
+                fill="none" stroke="rgba(56,189,248,.95)" stroke-width="3.25" stroke-linecap="round" />
+              <path id="lyArea"
+                d="M20,128 C70,124 90,120 120,116 C160,110 170,104 210,98 C250,94 265,90 290,86 C330,78 350,74 380,66
+                   L380,150 L20,150 Z"
+                fill="url(#lyFill)" />
+            </g>
+
+            <!-- arrow endpoint TY -->
+            <path d="M380 42 l-10 4 l4 -10" fill="none" stroke="var(--green)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+          </svg>
+        </div>
+
+        <button class="w-full text-center text-[11px] font-black mt-5 tracking-widest transition muted hover:opacity-100 opacity-80">
+          View Full Forecast ➜
+        </button>
+      </div>
+    </section>
+
+    <!-- NEW: WEATHER + SALES VISUALIZATION -->
+    <section class="glass p-6">
+      <div class="flex justify-between items-start gap-3">
+        <div>
+          <h3 class="font-black text-[12px] tracking-widest uppercase muted">Weather Impact</h3>
+          <div class="mt-2 flex items-center gap-2">
+            <span class="text-[14px] font-black">Today</span>
+            <span class="text-[11px] font-black muted">High</span>
+            <span class="text-[14px] font-black" style="color: var(--orange)" id="wxHi">58°</span>
+            <span class="text-[11px] font-black muted">Low</span>
+            <span class="text-[14px] font-black" style="color: rgba(56,189,248,.95)" id="wxLo">34°</span>
+          </div>
+          <p class="text-[11px] muted mt-1 leading-relaxed">
+            Forecasted sales often lift on mild days and soften on heavy rain/snow.
+          </p>
+        </div>
+
+        <div class="text-right">
+          <div class="text-[11px] font-black tracking-wide muted">Forecasted Sales</div>
+          <div class="text-[22px] font-black mt-1">$12.8K</div>
+          <div class="text-[11px] font-black mt-1" style="color: var(--green)">+ 6.5%</div>
+        </div>
+      </div>
+
+      <div class="divider my-4"></div>
+
+      <!-- 5-day strip: hi/lo + mini sales bars -->
+      <div class="grid grid-cols-5 gap-2">
+        <!-- Day 1 -->
+        <div class="rounded-2xl p-2" style="background: rgba(255,255,255,.04); border:1px solid var(--stroke2);">
+          <div class="text-[10px] font-black muted">Mon</div>
+          <div class="mt-2 flex items-baseline justify-between">
+            <span class="text-[11px] font-black" style="color: var(--orange)">61</span>
+            <span class="text-[11px] font-black" style="color: rgba(56,189,248,.95)">36</span>
+          </div>
+          <div class="mt-2 h-10 rounded-xl flex items-end overflow-hidden" style="background: rgba(255,255,255,.05); border:1px solid var(--stroke2);">
+            <div class="w-full rounded-xl" style="height:62%; background: rgba(52,211,153,.28);"></div>
+          </div>
+          <div class="text-[10px] font-black mt-2 muted">$12.3k</div>
+        </div>
+
+        <!-- Day 2 -->
+        <div class="rounded-2xl p-2" style="background: rgba(255,255,255,.04); border:1px solid var(--stroke2);">
+          <div class="text-[10px] font-black muted">Tue</div>
+          <div class="mt-2 flex items-baseline justify-between">
+            <span class="text-[11px] font-black" style="color: var(--orange)">58</span>
+            <span class="text-[11px] font-black" style="color: rgba(56,189,248,.95)">34</span>
+          </div>
+          <div class="mt-2 h-10 rounded-xl flex items-end overflow-hidden" style="background: rgba(255,255,255,.05); border:1px solid var(--stroke2);">
+            <div class="w-full rounded-xl" style="height:70%; background: rgba(52,211,153,.28);"></div>
+          </div>
+          <div class="text-[10px] font-black mt-2 muted">$12.8k</div>
+        </div>
+
+        <!-- Day 3 -->
+        <div class="rounded-2xl p-2" style="background: rgba(255,255,255,.04); border:1px solid var(--stroke2);">
+          <div class="text-[10px] font-black muted">Wed</div>
+          <div class="mt-2 flex items-baseline justify-between">
+            <span class="text-[11px] font-black" style="color: var(--orange)">52</span>
+            <span class="text-[11px] font-black" style="color: rgba(56,189,248,.95)">31</span>
+          </div>
+          <div class="mt-2 h-10 rounded-xl flex items-end overflow-hidden" style="background: rgba(255,255,255,.05); border:1px solid var(--stroke2);">
+            <div class="w-full rounded-xl" style="height:56%; background: rgba(245,158,11,.22);"></div>
+          </div>
+          <div class="text-[10px] font-black mt-2 muted">$11.9k</div>
+        </div>
+
+        <!-- Day 4 -->
+        <div class="rounded-2xl p-2" style="background: rgba(255,255,255,.04); border:1px solid var(--stroke2);">
+          <div class="text-[10px] font-black muted">Thu</div>
+          <div class="mt-2 flex items-baseline justify-between">
+            <span class="text-[11px] font-black" style="color: var(--orange)">55</span>
+            <span class="text-[11px] font-black" style="color: rgba(56,189,248,.95)">33</span>
+          </div>
+          <div class="mt-2 h-10 rounded-xl flex items-end overflow-hidden" style="background: rgba(255,255,255,.05); border:1px solid var(--stroke2);">
+            <div class="w-full rounded-xl" style="height:66%; background: rgba(52,211,153,.28);"></div>
+          </div>
+          <div class="text-[10px] font-black mt-2 muted">$12.6k</div>
+        </div>
+
+        <!-- Day 5 -->
+        <div class="rounded-2xl p-2" style="background: rgba(255,255,255,.04); border:1px solid var(--stroke2);">
+          <div class="text-[10px] font-black muted">Fri</div>
+          <div class="mt-2 flex items-baseline justify-between">
+            <span class="text-[11px] font-black" style="color: var(--orange)">59</span>
+            <span class="text-[11px] font-black" style="color: rgba(56,189,248,.95)">35</span>
+          </div>
+          <div class="mt-2 h-10 rounded-xl flex items-end overflow-hidden" style="background: rgba(255,255,255,.05); border:1px solid var(--stroke2);">
+            <div class="w-full rounded-xl" style="height:74%; background: rgba(52,211,153,.28);"></div>
+          </div>
+          <div class="text-[10px] font-black mt-2 muted">$13.1k</div>
+        </div>
+      </div>
+
+      <div class="mt-4 text-[11px] muted leading-relaxed">
+        <span class="font-black">Mock logic:</span> bars represent forecasted daily sales; hi/lo show temperature range.
+      </div>
+    </section>
+    </div>
+
+    <!-- STAFFING -->
+    <section class="glass p-6">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-black text-[12px] tracking-widest uppercase muted">Staffing Status</h3>
+        <span class="text-xs opacity-40">❯</span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-[16px] font-extrabold" style="color: var(--orange)">⚠ Understaffed</span>
+      </div>
+
+      <div class="divider my-4"></div>
+
+      <div class="flex items-center justify-between text-[13px] font-bold">
+        <div class="muted">
+          Scheduled: <span class="text-[15px] font-black" style="color: var(--text)">16</span>
+        </div>
+        <div class="muted">
+          Recommended: <span class="text-[15px] font-black" style="color: var(--text)">18</span>
+        </div>
+      </div>
+
+      <div class="mt-3 text-[11px] leading-relaxed muted">
+        <span class="font-black">AI note:</span>
+        Forecasted demand is trending up (+8.2%) and current coverage leaves key peak hours under-served. Adding 2 staff improves service speed and reduces overtime risk.
+      </div>
+
+      <div class="flex gap-2 mt-5">
+        <button class="btn-ghost-green flex-1 py-3 rounded-xl text-xs font-black transition active:scale-[.99]">
+          <span class="inline-flex items-center gap-2 justify-center">
+            <span class="text-[14px]" style="color: var(--green)">＋</span> Add 2 Staff
+          </span>
+        </button>
+
+        <button class="flex-1 py-3 rounded-xl text-xs font-black transition active:scale-[.99]"
+                style="background: var(--blue); color: white; box-shadow: 0 10px 30px rgba(37,99,235,.25);">
+          <span class="inline-flex items-center gap-2 justify-center">
+            <span class="text-[14px]">➜</span> Adjust Schedule
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <!-- EVENTS (main dashboard) + Manual Event Button -->
+    <section class="glass p-6" id="eventsCard">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-black text-[12px] tracking-widest uppercase muted">Events</h3>
+
+        <button
+          class="btn-ghost px-3 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase active:scale-[.99] transition"
+          onclick="openEventModal()"
+        >
+          + Manual Event
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                 style="background: rgba(37,99,235,.14); border: 1px solid rgba(37,99,235,.20);">
+              <span class="text-[14px]">📌</span>
+            </div>
+            <div>
+              <div class="text-[13px] font-black">Truck Delivery Window</div>
+              <div class="text-[11px] muted mt-0.5">Today • 2:00–4:00 PM</div>
+            </div>
+          </div>
+          <div class="text-[11px] font-black muted">Ops</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                 style="background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.18);">
+              <span class="text-[14px]">👥</span>
+            </div>
+            <div>
+              <div class="text-[13px] font-black">Team Standup</div>
+              <div class="text-[11px] muted mt-0.5">Tomorrow • 9:30 AM</div>
+            </div>
+          </div>
+          <div class="text-[11px] font-black muted">Staff</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="flex items-start justify-between gap-4">
+          <div class="flex gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+                 style="background: rgba(245,158,11,.12); border: 1px solid rgba(245,158,11,.18);">
+              <span class="text-[14px]">⚠️</span>
+            </div>
+            <div>
+              <div class="text-[13px] font-black">Labor Compliance Check</div>
+              <div class="text-[11px] muted mt-0.5">Fri • 11:00 AM</div>
+            </div>
+          </div>
+          <div class="text-[11px] font-black muted">Risk</div>
+        </div>
+      </div>
+
+      <button class="w-full mt-5 py-3 rounded-xl text-xs font-black transition btn-ghost"
+              onclick="openEventModal()">
+        View All Events
+      </button>
+    </section>
+
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="fixed bottom-6 left-4 right-4 max-w-[1100px] mx-auto nav-pill flex justify-around p-3">
+      <!-- Alerts -->
+      <div class="relative flex flex-col items-center opacity-55">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <span class="text-[9px] font-black uppercase mt-1 tracking-widest">Alerts</span>
+
+        <span class="absolute -top-2 -right-2 bg-red-500 text-[9px] font-black text-white rounded-full w-4 h-4 flex items-center justify-center border-2"
+              style="border-color: rgba(22,27,35,.85)">1</span>
+      </div>
+
+      <!-- Today (active) -->
+      <div class="flex flex-col items-center active-glow">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color: var(--green)">
+          <path d="M3 10.5 12 3l9 7.5"></path>
+          <path d="M5 10v10h14V10"></path>
+        </svg>
+        <span class="text-[9px] font-black uppercase mt-1 tracking-widest">Today</span>
+      </div>
+
+      <!-- Staffing -->
+      <div class="flex flex-col items-center opacity-55">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M16 11a4 4 0 1 0-8 0"></path>
+          <path d="M3 20a7 7 0 0 1 18 0"></path>
+        </svg>
+        <span class="text-[9px] font-black uppercase mt-1 tracking-widest">Staffing</span>
+      </div>
+
+      <!-- Events -->
+      <div class="flex flex-col items-center opacity-55" onclick="document.getElementById('eventsCard').scrollIntoView({behavior:'smooth'})">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M7 4v3"></path>
+          <path d="M17 4v3"></path>
+          <path d="M3 9h18"></path>
+          <path d="M6 12h4"></path>
+          <path d="M6 16h6"></path>
+          <path d="M5 21h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"></path>
+        </svg>
+        <span class="text-[9px] font-black uppercase mt-1 tracking-widest">Events</span>
+      </div>
+    </nav>
+
+    <!-- EVENT MODAL (Google Calendar-ish) -->
+    <div id="eventModal" class="fixed inset-0 z-50 hidden">
+      <!-- backdrop -->
+      <div class="absolute inset-0" style="background: rgba(0,0,0,.55);" onclick="closeEventModal()"></div>
+
+      <!-- modal -->
+    <div class="absolute left-1/2 top-1/2 w-[calc(100%-48px)] max-w-[560px] -translate-x-1/2 -translate-y-1/2 glass p-4"
+           style="border-radius: 24px;">
+        <div class="flex items-center justify-between">
+          <div class="text-[12px] font-black tracking-widest uppercase muted">Create Event</div>
+          <button class="btn-ghost px-3 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase"
+                  onclick="closeEventModal()">Close</button>
+        </div>
+
+        <div class="divider my-4"></div>
+
+        <!-- header: month nav -->
+        <div class="flex items-center justify-between">
+          <button class="btn-ghost w-10 h-10 rounded-xl font-black" onclick="shiftMonth(-1)">‹</button>
+
+          <div class="text-center">
+            <div id="calMonthLabel" class="text-[14px] font-black"></div>
+            <div id="calSubLabel" class="text-[11px] muted mt-0.5">Tap a day to schedule</div>
+          </div>
+
+          <button class="btn-ghost w-10 h-10 rounded-xl font-black" onclick="shiftMonth(1)">›</button>
+        </div>
+
+        <!-- calendar + form -->
+        <div class="mt-4 grid grid-cols-1 gap-3">
+          <!-- calendar -->
+          <div class="rounded-2xl p-3"
+               style="background: rgba(255,255,255,.04); border: 1px solid var(--stroke2);">
+            <div class="grid grid-cols-7 gap-1 text-center">
+              <div class="text-[10px] font-black muted">S</div>
+              <div class="text-[10px] font-black muted">M</div>
+              <div class="text-[10px] font-black muted">T</div>
+              <div class="text-[10px] font-black muted">W</div>
+              <div class="text-[10px] font-black muted">T</div>
+              <div class="text-[10px] font-black muted">F</div>
+              <div class="text-[10px] font-black muted">S</div>
+            </div>
+
+            <div id="calGrid" class="mt-2 grid grid-cols-7 gap-1"></div>
+
+            <div class="mt-3 text-[10px] muted">
+              <span class="font-black">Selected:</span> <span id="calSelectedLabel">None</span>
+            </div>
+          </div>
+
+          <!-- form -->
+          <div class="rounded-2xl p-3"
+               style="background: rgba(255,255,255,.04); border: 1px solid var(--stroke2);">
+            <div class="flex items-center justify-between">
+              <div class="text-[11px] font-black muted tracking-widest uppercase">New Event</div>
+              <span class="text-[10px] font-black muted tracking-widest uppercase">Prototype</span>
+            </div>
+
+            <div class="mt-3 grid grid-cols-2 gap-2">
+              <input id="evtTitle" class="input" placeholder="Event title" />
+              <select id="evtType" class="input">
+                <option value="Ops">Type: Ops</option>
+                <option value="Staff">Type: Staff</option>
+                <option value="Risk">Type: Risk</option>
+                <option value="Sales">Type: Sales</option>
+              </select>
+
+              <input id="evtTimeStart" class="input" placeholder="Start (e.g. 2:00 PM)" />
+              <input id="evtTimeEnd" class="input" placeholder="End (e.g. 4:00 PM)" />
+            </div>
+
+            <textarea id="evtNotes" class="input mt-2" rows="3" placeholder="Notes (optional)"></textarea>
+
+            <div class="mt-3 flex gap-2">
+              <button class="btn-ghost-green flex-1 py-3 rounded-xl text-xs font-black" onclick="saveEventFromModal()">
+                Save Event
+              </button>
+              <button class="btn-ghost flex-1 py-3 rounded-xl text-xs font-black" onclick="resetEventModal()">
+                Clear
+              </button>
+            </div>
+
+            <div class="mt-3 text-[10px] muted leading-relaxed">
+              <span class="font-black">Mock behavior:</span> saves to a local array + shows a tiny “dot” on that date.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  </div>
+
+  <script>
+    // Date
+    const d = new Date();
+    const fmt = new Intl.DateTimeFormat(undefined, { weekday: "short", month: "short", day: "numeric" });
+    const el = document.getElementById("todayDate");
+    if (el) el.textContent = fmt.format(d);
+
+    // --- Calendar-style Event Modal ---
+    const eventModal = document.getElementById("eventModal");
+    const calGrid = document.getElementById("calGrid");
+    const calMonthLabel = document.getElementById("calMonthLabel");
+    const calSelectedLabel = document.getElementById("calSelectedLabel");
+
+    let calCursor = new Date(); // month being viewed
+    let selectedDate = null;    // Date object
+    const mockEvents = [];      // { title, type, dateISO, start, end, notes }
+
+    function openEventModal() {
+      if (!eventModal) return;
+      eventModal.classList.remove("hidden");
+
+      // default select today if none
+      if (!selectedDate) selectedDate = new Date();
+      // align cursor to selected month
+      calCursor = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+
+      renderCalendar();
+      syncSelectedLabel();
+    }
+
+    function closeEventModal() {
+      if (!eventModal) return;
+      eventModal.classList.add("hidden");
+    }
+
+    function shiftMonth(delta) {
+      calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth() + delta, 1);
+      renderCalendar();
+    }
+
+    function dateISO(d) {
+      // YYYY-MM-DD in local time
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function hasEventOn(iso) {
+      return mockEvents.some(e => e.dateISO === iso);
+    }
+
+    function renderCalendar() {
+      if (!calGrid || !calMonthLabel) return;
+
+      const year = calCursor.getFullYear();
+      const month = calCursor.getMonth();
+
+      const monthName = calCursor.toLocaleString(undefined, { month: "long" });
+      calMonthLabel.textContent = `${monthName} ${year}`;
+
+      // calendar math
+      const first = new Date(year, month, 1);
+      const startDay = first.getDay(); // 0..6 (Sun..Sat)
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      // clear
+      calGrid.innerHTML = "";
+
+      // leading blanks
+      for (let i = 0; i < startDay; i++) {
+        const blank = document.createElement("div");
+        blank.className = "h-10";
+        calGrid.appendChild(blank);
+      }
+
+      // days
+      for (let day = 1; day <= daysInMonth; day++) {
+        const d = new Date(year, month, day);
+        const iso = dateISO(d);
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className =
+          "h-10 rounded-xl text-[12px] font-black relative transition active:scale-[.99]";
+        btn.style.background = "rgba(255,255,255,.04)";
+        btn.style.border = "1px solid var(--stroke2)";
+
+        // selected styling
+        if (selectedDate && dateISO(selectedDate) === iso) {
+          btn.style.border = "1px solid rgba(52,211,153,.35)";
+          btn.style.background = "rgba(52,211,153,.10)";
+        }
+
+        // today subtle ring
+        const today = new Date();
+        if (dateISO(today) === iso) {
+          btn.style.boxShadow = "inset 0 0 0 1px rgba(56,189,248,.22)";
+        }
+
+        btn.textContent = String(day);
+
+        // event dot
+        if (hasEventOn(iso)) {
+          const dot = document.createElement("span");
+          dot.className = "absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full";
+          dot.style.background = "rgba(52,211,153,.95)";
+          btn.appendChild(dot);
+        }
+
+        btn.addEventListener("click", () => {
+          selectedDate = d;
+          renderCalendar();
+          syncSelectedLabel();
+        });
+
+        calGrid.appendChild(btn);
+      }
+    }
+
+    function syncSelectedLabel() {
+      if (!calSelectedLabel) return;
+      if (!selectedDate) {
+        calSelectedLabel.textContent = "None";
+        return;
+      }
+      calSelectedLabel.textContent = selectedDate.toLocaleDateString(undefined, {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      });
+    }
+
+    function resetEventModal() {
+      const t = document.getElementById("evtTitle");
+      const ty = document.getElementById("evtType");
+      const s = document.getElementById("evtTimeStart");
+      const e = document.getElementById("evtTimeEnd");
+      const n = document.getElementById("evtNotes");
+
+      if (t) t.value = "";
+      if (ty) ty.value = "Ops";
+      if (s) s.value = "";
+      if (e) e.value = "";
+      if (n) n.value = "";
+    }
+
+    function saveEventFromModal() {
+      if (!selectedDate) {
+        // force a selection to keep the UX “calendar-first”
+        const sub = document.getElementById("calSubLabel");
+        if (sub) sub.textContent = "Select a day first 👇";
+        return;
+      }
+
+      const title = (document.getElementById("evtTitle")?.value || "").trim();
+      const type = document.getElementById("evtType")?.value || "Ops";
+      const start = (document.getElementById("evtTimeStart")?.value || "").trim();
+      const end = (document.getElementById("evtTimeEnd")?.value || "").trim();
+      const notes = (document.getElementById("evtNotes")?.value || "").trim();
+
+      if (!title) {
+        const sub = document.getElementById("calSubLabel");
+        if (sub) sub.textContent = "Add a title to save ✍️";
+        return;
+      }
+
+      mockEvents.push({
+        title,
+        type,
+        dateISO: dateISO(selectedDate),
+        start,
+        end,
+        notes
+      });
+
+      // quick feedback
+      const sub = document.getElementById("calSubLabel");
+      if (sub) sub.textContent = "Saved ✅ (prototype)";
+
+      // show dot
+      renderCalendar();
+
+      // clear form (keep date selection)
+      resetEventModal();
+    }
+
+    // Segmented control helper
+    function setSegmentActive(containerEl, activeBtn) {
+      [...containerEl.querySelectorAll("button")].forEach(btn => btn.dataset.active = "false");
+      activeBtn.dataset.active = "true";
+    }
+
+    // Sales mock state
+    const state = {
+      range: "7",      // "7" | "30"
+      year: "ty",      // "ty" | "ly" (changes displayed avg/delta + primary line)
+      showLyLine: false
+    };
+
+    // Elements
+    const rangeSeg = document.getElementById("rangeSeg");
+    const yearSeg = document.getElementById("yearSeg");
+    const lyGroup = document.getElementById("lyGroup");
+    const toggleLyLineBtn = document.getElementById("toggleLyLine");
+    const avgVal = document.getElementById("avgVal");
+    const avgDelta = document.getElementById("avgDelta");
+    const tyLine = document.getElementById("tyLine");
+    const tyArea = document.getElementById("tyArea");
+
+    // Mock data (swap numbers + paths for 7 vs 30 & TY vs LY)
+    const mock = {
+      "7": {
+        ty: {
+          avg: "$13,250",
+          delta: "+ 8.2%",
+          tyLineD: "M20,120 C70,118 90,110 120,106 C160,98 170,88 210,84 C250,80 265,72 290,68 C330,60 350,56 380,42",
+          tyAreaD: "M20,120 C70,118 90,110 120,106 C160,98 170,88 210,84 C250,80 265,72 290,68 C330,60 350,56 380,42 L380,150 L20,150 Z"
+        },
+        ly: {
+          avg: "$12,980",
+          delta: "+ 4.1%",
+          // When user switches "Last Year" tab, we show LY as primary (TY line becomes still shown visually as green, but values change)
+          tyLineD: "M20,128 C70,124 90,120 120,116 C160,110 170,104 210,98 C250,94 265,90 290,86 C330,78 350,74 380,66",
+          tyAreaD: "M20,128 C70,124 90,120 120,116 C160,110 170,104 210,98 C250,94 265,90 290,86 C330,78 350,74 380,66 L380,150 L20,150 Z"
+        }
+      },
+      "30": {
+        ty: {
+          avg: "$12,740",
+          delta: "+ 5.6%",
+          tyLineD: "M20,126 C70,124 90,122 120,118 C160,112 180,100 210,96 C245,92 265,88 290,82 C320,74 350,64 380,58",
+          tyAreaD: "M20,126 C70,124 90,122 120,118 C160,112 180,100 210,96 C245,92 265,88 290,82 C320,74 350,64 380,58 L380,150 L20,150 Z"
+        },
+        ly: {
+          avg: "$12,310",
+          delta: "+ 2.9%",
+          tyLineD: "M20,134 C70,132 90,130 120,126 C160,122 180,116 210,112 C245,108 265,104 290,98 C320,92 350,88 380,82",
+          tyAreaD: "M20,134 C70,132 90,130 120,126 C160,122 180,116 210,112 C245,108 265,104 290,98 C320,92 350,88 380,82 L380,150 L20,150 Z"
+        }
+      }
+    };
+
+    function renderSales() {
+      // Update avg + delta
+      const m = mock[state.range][state.year];
+      if (avgVal) avgVal.textContent = m.avg;
+      if (avgDelta) avgDelta.textContent = m.delta;
+
+      // Update primary path (we reuse tyLine/tyArea as the "active" dataset line for prototype simplicity)
+      if (tyLine) tyLine.setAttribute("d", m.tyLineD);
+      if (tyArea) tyArea.setAttribute("d", m.tyAreaD);
+
+      // Toggle LY comparison line visibility
+      if (lyGroup) {
+        lyGroup.style.opacity = state.showLyLine ? "0.95" : "0.0";
+      }
+      if (toggleLyLineBtn) {
+        toggleLyLineBtn.textContent = state.showLyLine ? "Hide LY Line" : "Show LY Line";
+      }
+    }
+
+    if (rangeSeg) {
+      rangeSeg.addEventListener("click", (e) => {
+        const btn = e.target.closest("button");
+        if (!btn) return;
+        state.range = btn.dataset.range || "7";
+        setSegmentActive(rangeSeg, btn);
+        renderSales();
+      });
+    }
+
+    if (yearSeg) {
+      yearSeg.addEventListener("click", (e) => {
+        const btn = e.target.closest("button");
+        if (!btn) return;
+        state.year = btn.dataset.year || "ty";
+        setSegmentActive(yearSeg, btn);
+        renderSales();
+      });
+    }
+
+    if (toggleLyLineBtn) {
+      toggleLyLineBtn.addEventListener("click", () => {
+        state.showLyLine = !state.showLyLine;
+        renderSales();
+      });
+    }
+
+    // Initial render
+    renderSales();
+  </script>
+</body>
+</html>
+

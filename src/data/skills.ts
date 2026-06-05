@@ -1,0 +1,28 @@
+export const skills = {
+  languages: ["JavaScript", "TypeScript", "Python", "HTML5", "CSS3"],
+  frameworks: [
+    "React",
+    "TypeScript",
+    "Material UI (MUI)",
+    "Formik",
+    "Node.js",
+    "Redux",
+    "Tailwind CSS",
+    "Express.js",
+  ],
+  databases: ["PostgreSQL", "MySQL", "Prisma"],
+  tools: [
+    "Git/GitHub",
+    "Jira",
+    "Jest",
+    "Webpack",
+    "RESTful API Development",
+    "API Integration",
+    "Payments / ACH / PayFac platforms",
+    "AI/LLM Integration (OpenAI, pgvector)",
+    "Progressive Web Apps (PWA)",
+    "Responsive Web Design",
+    "UI/UX Principles",
+  ],
+  additional: ["AI-Powered Application Development", "Data Modeling"],
+} as const;

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Aiugment  AI agent workspace">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1020"/>
+      <stop offset="100%" stop-color="#141a2e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7c83ff"/>
+      <stop offset="100%" stop-color="#9499ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)"/>
+  <rect x="80" y="80" width="1040" height="515" rx="12" fill="none" stroke="#2a3148" stroke-width="1"/>
+  <text x="600" y="300" fill="url(#accent)" font-family="system-ui, sans-serif" font-size="56" font-weight="500" text-anchor="middle">Aiugment</text>
+  <text x="600" y="360" fill="#a8b0c4" font-family="system-ui, sans-serif" font-size="22" text-anchor="middle">Five AI agents. One project workspace.</text>
+  <text x="600" y="420" fill="#6b7289" font-family="ui-monospace, monospace" font-size="14" text-anchor="middle">PM � Analyst � Developer � Reviewer � Security</text>
+</svg>
