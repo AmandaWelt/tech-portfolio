@@ -6,9 +6,11 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
+const routerBasename = process.env.PUBLIC_URL?.replace(/\/$/, "") || undefined;
+
 root.render(
   <React.StrictMode>
-    <BrowserRouter basename={process.env.PUBLIC_URL}>
+    <BrowserRouter basename={routerBasename}>
       <App />
     </BrowserRouter>
   </React.StrictMode>

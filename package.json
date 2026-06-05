@@ -2,7 +2,7 @@
   "name": "tech-portfolio",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://amandawelt.github.io/tech-portfolio",
+  "homepage": "/tech-portfolio",
   "engines": {
     "node": ">=18.0.0"
   },
@@ -31,6 +31,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "postbuild": "node scripts/copy-404.mjs",
     "test": "react-scripts test",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint src --ext .js,.jsx,.ts,.tsx --fix",
