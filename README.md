@@ -21,9 +21,11 @@ Every **push to `main`** triggers [GitHub Actions](.github/workflows/deploy.yml)
 
 1. **Settings → Pages → Build and deployment → Source:** `GitHub Actions`
 2. Push to `main` — the **Actions** tab shows the deploy workflow
-3. Site URL: **https://amandawelt.github.io/tech-portfolio**
+3. Site URL: **https://amandawelt.github.io/tech-portfolio** or your custom domain
 
-Custom domain (`amandawelt.com`): add it under **Settings → Pages → Custom domain** and follow GitHub’s DNS instructions.
+Custom domain (`amandawelt.com`): add it under **Settings → Pages → Custom domain** and follow GitHub’s DNS instructions. The build uses relative asset paths and works on both the `github.io/tech-portfolio` URL and a custom domain at root — no extra env vars needed.
+
+After switching Pages source to **GitHub Actions**, push to `main` once more (or run the **Deploy portfolio** workflow manually under **Actions**) so a fresh build replaces the old branch deploy.
 
 ## Scripts
 

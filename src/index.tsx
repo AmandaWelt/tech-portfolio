@@ -1,16 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
+import { getRouterBasename } from "./lib/basePath";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
-const routerBasename = process.env.PUBLIC_URL?.replace(/\/$/, "") || undefined;
 
 root.render(
   <React.StrictMode>
-    <BrowserRouter basename={routerBasename}>
+    <BrowserRouter basename={getRouterBasename()}>
       <App />
     </BrowserRouter>
   </React.StrictMode>

@@ -32,10 +32,6 @@ jobs:
           cache: npm
 
       - name: Install and build
-        env:
-          # GitHub project site: https://<user>.github.io/tech-portfolio/
-          # Custom domain at root (e.g. amandawelt.com): set repo variable PUBLIC_URL to /
-          PUBLIC_URL: ${{ vars.PUBLIC_URL || '/tech-portfolio' }}
         run: |
           npm ci --legacy-peer-deps
           npm run build

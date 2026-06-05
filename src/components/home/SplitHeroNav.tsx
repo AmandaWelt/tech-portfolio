@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { site } from "../../data/profile";
+import { getBasePath } from "../../lib/basePath";
 import { parseNavTo, scrollToSection } from "../../lib/navScroll";
 
 const SplitHeroNav: React.FC = () => {
@@ -28,7 +29,7 @@ const SplitHeroNav: React.FC = () => {
     if (!target.hash || pathname !== target.pathname) return;
     event.preventDefault();
     scrollToSection(target.hash);
-    const base = process.env.PUBLIC_URL || "";
+    const base = getBasePath();
     window.history.pushState(null, "", `${base}${target.pathname}${target.hash}`);
   };
 

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { site } from "../../data/profile";
+import { publicAsset } from "../../lib/publicAsset";
 import { isHeroInteractiveTarget } from "../../lib/navScroll";
 import BuildSideDeco from "./BuildSideDeco";
 import SketchDrawOverlay from "./SketchDrawOverlay";
@@ -8,8 +9,6 @@ import SplitHeroNav from "./SplitHeroNav";
 
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 const SKETCH_EXPAND_THRESHOLD = 50;
-
-const publicAsset = (path: string) => `${process.env.PUBLIC_URL || ""}${encodeURI(path)}`;
 
 const SplitHero: React.FC = () => {
   const rootRef = useRef<HTMLElement>(null);
